@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRAHARI v5.0 — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   PRAHARI SETTINGS — CSS Variables & Reset
+══════════════════════════════════════════ */
+:root {
+  --bg:#060d14;--bg2:#0a1520;--bg3:#0d1d2e;--bg4:#0f2236;
+  --border:#1a3a5c;--border2:#1e4a72;--border-lt:#163d5e;
+  --green:#00ff88;--green2:#00cc6a;--green3:#004d28;
+  --red:#ff3355;--red2:#cc2244;
+  --amber:#ffaa00;--amber2:#cc8800;
+  --blue:#00aaff;--blue2:#0088cc;
+  --cyan:#00ffdd;--purple:#c084fc;
+  --text:#c8e0f4;--text2:#7aabb8;--text3:#3a6070;
+  --card:#0a1825;--card2:#0d2035;
+  --font-mono:'Share Tech Mono',monospace;
+  --font-main:'Rajdhani',sans-serif;
+  --font-head:'Orbitron',sans-serif;
+  --success:#00ff88;--warning:#ffaa00;--danger:#ff3355;
+  --input-bg:rgba(0,0,0,0.35);
+  --input-border:var(--border2);
+  --shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --bg:#e8f0f7;--bg2:#dde8f2;--bg3:#d2e0ed;--bg4:#c8d8e8;
+  --border:#a0bcd4;--border2:#7aa0bc;--border-lt:#8ab0c8;
+  --text:#0d2035;--text2:#2a5070;--text3:#5a8090;
+  --card:#f0f6fc;--card2:#e5eef6;
+  --input-bg:rgba(255,255,255,0.6);
+  --input-border:#7aa0bc;
+  --shadow:0 8px 32px rgba(0,50,100,0.15);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font-main);font-size:15px;transition:background .3s,color .3s}
+
+/* ══ SCANLINE OVERLAY ══ */
+.scanline{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,.005) 2px,rgba(0,255,136,.005) 4px);pointer-events:none;z-index:9997;animation:scanMove 10s linear infinite}
+[data-theme="light"] .scanline{background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,100,200,.005) 2px,rgba(0,100,200,.005) 4px)}
+@keyframes scanMove{0%{background-position:0 0}100%{background-position:0 100px}}
+
+/* ══ NAV ══ */
+nav{background:rgba(6,13,20,.97);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);box-shadow:0 2px 20px rgba(0,0,0,.5)}
+[data-theme="light"] nav{background:rgba(232,240,247,.97)}
+nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.3),transparent)}
+.nav-logo{font-family:var(--font-head);font-size:14px;color:var(--green);letter-spacing:3px;display:flex;align-items:center;gap:10px;user-select:none;flex-shrink:0;text-shadow:0 0 20px rgba(0,255,136,.3)}
+.nav-logo .dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;box-shadow:0 0 8px var(--green)}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--green)}50%{opacity:.5;box-shadow:0 0 16px var(--green)}}
+.nav-logo .vtag{font-size:9px;color:var(--text3);letter-spacing:2px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.15);padding:2px 6px;border-radius:2px}
+.nav-tabs{display:flex;gap:1px;overflow-x:auto;scrollbar-width:none;flex:1;margin:0 16px}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{background:none;border:none;color:var(--text2);padding:7px 12px;font-family:var(--font-main);font-size:12px;letter-spacing:1px;cursor:pointer;border-radius:3px;transition:all .2s;text-transform:uppercase;position:relative;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+.nav-tab.active,.nav-tab:hover{color:var(--green);background:rgba(0,255,136,.06)}
+.nav-tab.active::after{content:'';position:absolute;bottom:-1px;left:6px;right:6px;height:2px;background:var(--green);border-radius:2px;box-shadow:0 0 6px var(--green)}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.user-avatar-sm{width:32px;height:32px;border-radius:3px;border:1px solid var(--green);object-fit:cover;cursor:pointer;transition:all .2s;background:rgba(0,255,136,.1);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden}
+.user-avatar-sm:hover{box-shadow:0 0 12px rgba(0,255,136,.3)}
+
+/* ══ LAYOUT ══ */
+.settings-layout{display:grid;grid-template-columns:240px 1fr;gap:0;min-height:calc(100vh - 54px)}
+@media(max-width:768px){.settings-layout{grid-template-columns:1fr}}
+
+/* ══ SIDEBAR NAV ══ */
+.settings-nav{background:rgba(6,13,20,.8);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+[data-theme="light"] .settings-nav{background:rgba(240,246,252,.9)}
+@media(max-width:768px){.settings-nav{display:none}}
+.sn-title{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:0 18px 10px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.sn-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;transition:all .2s;border-left:2px solid transparent;font-size:13px;letter-spacing:.5px;color:var(--text2);position:relative}
+.sn-item:hover{color:var(--text);background:rgba(0,255,136,.04);border-left-color:rgba(0,255,136,.3)}
+.sn-item.active{color:var(--green);background:rgba(0,255,136,.06);border-left-color:var(--green)}
+.sn-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sn-badge{margin-left:auto;font-family:var(--font-mono);font-size:8px;padding:2px 6px;background:rgba(255,51,85,.15);border:1px solid var(--red2);color:var(--red);border-radius:2px}
+.sn-divider{height:1px;background:var(--border);margin:10px 18px}
+
+/* ══ MAIN CONTENT ══ */
+.settings-main{padding:28px 32px;overflow-y:auto}
+@media(max-width:768px){.settings-main{padding:16px}}
+
+/* ══ PAGE HEADER ══ */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:16px}
+.page-title{font-family:var(--font-head);font-size:18px;color:var(--green);letter-spacing:3px;text-shadow:0 0 20px rgba(0,255,136,.2)}
+.page-sub{font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:1px;margin-top:5px}
+.save-all-btn{background:linear-gradient(135deg,var(--green),var(--green2));border:none;color:#000;padding:10px 22px;font-family:var(--font-head);font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;border-radius:3px;transition:all .3s;white-space:nowrap}
+.save-all-btn:hover{box-shadow:0 0 20px rgba(0,255,136,.4);transform:translateY(-1px)}
+.save-all-btn:active{transform:translateY(0)}
+
+/* ══ SECTIONS ══ */
+.settings-section{display:none}
+.settings-section.active{display:block}
+
+/* ══ SECTION TITLE ══ */
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.sec-icon{font-size:22px}
+.sec-title{font-family:var(--font-head);font-size:12px;color:var(--text);letter-spacing:2px}
+.sec-desc{font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ══ CARDS ══ */
+.settings-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:22px;margin-bottom:16px;transition:border-color .2s;position:relative;overflow:hidden}
+.settings-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.15),transparent)}
+.settings-card:hover{border-color:var(--border2)}
+.card-title{font-family:var(--font-head);font-size:10px;letter-spacing:2px;color:var(--text2);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';width:10px;height:1px;background:var(--green);box-shadow:0 0 4px var(--green)}
+
+/* ══ PROFILE SECTION ══ */
+.profile-hero{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.avatar-zone{flex-shrink:0;text-align:center}
+.avatar-frame{position:relative;width:96px;height:96px;margin:0 auto 10px}
+.avatar-img{width:96px;height:96px;border-radius:4px;border:2px solid var(--green);background:linear-gradient(135deg,rgba(0,255,136,.1),rgba(0,170,255,.05));display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden;position:relative;cursor:pointer;transition:all .3s}
+.avatar-img:hover{box-shadow:0 0 20px rgba(0,255,136,.3)}
+.avatar-img img{width:100%;height:100%;object-fit:cover;display:none}
+.avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:20px;border-radius:3px}
+.avatar-img:hover .avatar-overlay{opacity:1}
+.avatar-ring{position:absolute;inset:-4px;border:1px solid rgba(0,255,136,.3);border-radius:6px;animation:ringPulse 3s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.7;transform:scale(1.02)}}
+.avatar-status{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:9px;color:var(--green);padding:3px 8px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);border-radius:2px}
+.status-dot{width:5px;height:5px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+.avatar-upload-btn{display:block;margin-top:8px;font-family:var(--font-mono);font-size:9px;color:var(--blue);cursor:pointer;letter-spacing:1px;background:none;border:1px solid rgba(0,170,255,.2);padding:4px 10px;border-radius:2px;transition:all .2s;width:100%}
+.avatar-upload-btn:hover{background:rgba(0,170,255,.08);border-color:var(--blue)}
+.avatar-input{display:none}
+.profile-fields{flex:1;min-width:240px}
+
+/* ══ FORM ELEMENTS ══ */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.form-row.single{grid-template-columns:1fr}
+.field{margin-bottom:0}
+.field-label{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.field-hint{font-size:8px;color:var(--text3);font-style:italic;letter-spacing:0}
+.field-input{width:100%;background:var(--input-bg);border:1px solid var(--input-border);color:var(--text);padding:10px 14px;font-family:var(--font-mono);font-size:12px;outline:none;border-radius:3px;transition:all .25s}
+.field-input:focus{border-color:var(--green);background:rgba(0,0,0,.5);box-shadow:0 0 14px rgba(0,255,136,.1),inset 0 0 8px rgba(0,255,136,.03)}
+.field-input::placeholder{color:var(--text3)}
+[data-theme="light"] .field-input:focus{background:rgba(255,255,255,.8);box-shadow:0 0 10px rgba(0,150,100,.15)}
+.field-input:disabled{opacity:.5;cursor:not-allowed}
+.field-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300ff88' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.pw-wrap{position:relative}
+.pw-wrap .field-input{padding-right:42px}
+.pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;padding:2px;transition:color .2s}
+.pw-eye:hover{color:var(--green)}
+.pw-strength{margin-top:6px}
+.pw-bar{height:3px;border-radius:2px;background:var(--border);overflow:hidden}
+.pw-bar-fill{height:100%;border-radius:2px;transition:all .4s;width:0}
+.pw-label{font-family:var(--font-mono);font-size:9px;margin-top:4px;letter-spacing:1px}
+.pw-criteria{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px}
+.crit{font-family:var(--font-mono);font-size:10px;color:var(--text3);display:flex;align-items:center;gap:5px}
+.crit::before{content:'✗';color:var(--red);font-size:10px;flex-shrink:0}
+.crit.ok{color:var(--green2)}.crit.ok::before{content:'✓';color:var(--green)}
+
+/* ══ TOGGLE SWITCH ══ */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info{flex:1;padding-right:20px}
+.toggle-label{font-size:13px;color:var(--text);font-weight:600;letter-spacing:.5px}
+.toggle-desc{font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-top:3px;line-height:1.5}
+.toggle{position:relative;width:42px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border:1px solid var(--border2);border-radius:22px;cursor:pointer;transition:all .3s}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;top:2px;left:2px;background:var(--text3);border-radius:50%;transition:all .3s}
+.toggle input:checked + .toggle-slider{background:rgba(0,255,136,.2);border-color:var(--green);box-shadow:0 0 8px rgba(0,255,136,.2)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px);background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* ══ THEME SWITCHER ══ */
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.theme-card{border:2px solid var(--border);border-radius:4px;padding:16px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.theme-card:hover{border-color:var(--border2)}
+.theme-card.selected{border-color:var(--green);box-shadow:0 0 16px rgba(0,255,136,.15)}
+.theme-card.selected::after{content:'✓ ACTIVE';position:absolute;top:8px;right:8px;font-family:var(--font-mono);font-size:8px;color:var(--green);background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);padding:2px 6px;border-radius:2px}
+.theme-preview{height:56px;border-radius:3px;margin-bottom:10px;overflow:hidden;position:relative;display:flex;gap:4px;padding:6px}
+.theme-preview-dark{background:#060d14;border:1px solid #1a3a5c}
+.theme-preview-light{background:#e8f0f7;border:1px solid #a0bcd4}
+.theme-dot{width:8px;height:8px;border-radius:2px;margin-top:auto}
+.tp-bar{height:4px;border-radius:2px;flex:1;margin-top:auto}
+.tp-accent{background:#00ff88}.tp-muted{background:rgba(0,255,136,.3)}.tp-border{background:#1a3a5c}
+.tp-accent-l{background:#00cc6a}.tp-muted-l{background:rgba(0,180,100,.3)}.tp-border-l{background:#a0bcd4}
+.theme-name{font-family:var(--font-head);font-size:10px;letter-spacing:2px;color:var(--text)}
+.theme-tag{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:2px}
+
+/* ══ ACCENT COLOR PICKER ══ */
+.accent-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.accent-opt{width:32px;height:32px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative}
+.accent-opt:hover{transform:scale(1.1)}
+.accent-opt.active{border-color:#fff;box-shadow:0 0 10px currentColor}
+.accent-opt.active::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#000;font-weight:bold}
+
+/* ══ SECURITY METER ══ */
+.sec-meter{margin-bottom:14px}
+.sec-score{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.sec-score-num{font-family:var(--font-head);font-size:36px;line-height:1}
+.sec-score-label{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--text2)}
+.sec-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.sec-bar-fill{height:100%;border-radius:3px;transition:width .8s ease}
+
+/* ══ SESSION TABLE ══ */
+.session-table{width:100%;border-collapse:collapse;font-size:12px}
+.session-table th{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--text3);text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.session-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--font-mono);color:var(--text2)}
+.session-table tr:hover td{background:rgba(0,255,136,.02)}
+.session-badge{font-size:8px;padding:2px 6px;border-radius:2px;letter-spacing:1px}
+.sb-current{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.3);color:var(--green)}
+.sb-old{background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.2);color:var(--amber)}
+.session-kill{background:none;border:1px solid rgba(255,51,85,.2);color:var(--red);padding:3px 8px;font-family:var(--font-mono);font-size:9px;cursor:pointer;border-radius:2px;transition:all .2s;letter-spacing:1px}
+.session-kill:hover{background:rgba(255,51,85,.1);box-shadow:0 0 8px rgba(255,51,85,.2)}
+
+/* ══ NOTIFICATION GRID ══ */
+.notif-channels{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.notif-channel{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:3px;padding:14px;cursor:pointer;transition:all .3s;text-align:center}
+.notif-channel.on{border-color:var(--green);background:rgba(0,255,136,.05)}
+.notif-channel:hover{border-color:var(--border2)}
+.nc-icon{font-size:24px;margin-bottom:6px}
+.nc-name{font-family:var(--font-head);font-size:9px;letter-spacing:1px;color:var(--text2)}
+.nc-status{font-family:var(--font-mono);font-size:8px;margin-top:3px}
+.nc-status.on{color:var(--green)}.nc-status.off{color:var(--text3)}
+
+/* ══ BUTTONS ══ */
+.btn{padding:9px 18px;font-family:var(--font-head);font-size:10px;letter-spacing:1px;cursor:pointer;border-radius:3px;transition:all .3s;text-transform:uppercase;border:none}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#000;font-weight:700}
+.btn-primary:hover{box-shadow:0 0 18px rgba(0,255,136,.4);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--green);color:var(--green)}
+.btn-outline:hover{background:rgba(0,255,136,.08);box-shadow:0 0 12px rgba(0,255,136,.2)}
+.btn-danger{background:transparent;border:1px solid rgba(255,51,85,.3);color:var(--red)}
+.btn-danger:hover{background:rgba(255,51,85,.1);box-shadow:0 0 12px rgba(255,51,85,.2)}
+.btn-blue{background:transparent;border:1px solid rgba(0,170,255,.3);color:var(--blue)}
+.btn-blue:hover{background:rgba(0,170,255,.08);box-shadow:0 0 12px rgba(0,170,255,.2)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn-sm{padding:6px 12px;font-size:9px}
+
+/* ══ TOAST ══ */
+#toast{position:fixed;bottom:28px;right:28px;background:var(--bg3);border:1px solid var(--green);color:var(--green);padding:12px 18px;font-family:var(--font-mono);font-size:11px;border-radius:3px;z-index:9999;transform:translateY(20px);opacity:0;transition:all .4s;pointer-events:none;box-shadow:0 4px 20px rgba(0,255,136,.2)}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.error{border-color:var(--red);color:var(--red);box-shadow:0 4px 20px rgba(255,51,85,.2)}
+
+/* ══ ALERT BOX ══ */
+.alert{padding:10px 14px;border-radius:3px;font-family:var(--font-mono);font-size:11px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert-warn{background:rgba(255,170,0,.07);border:1px solid rgba(255,170,0,.2);color:var(--amber)}
+.alert-danger{background:rgba(255,51,85,.07);border:1px solid rgba(255,51,85,.2);color:var(--red)}
+.alert-info{background:rgba(0,170,255,.07);border:1px solid rgba(0,170,255,.2);color:var(--blue)}
+.alert-success{background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2);color:var(--green)}
+
+/* ══ PROGRESS ══ */
+.profile-complete{margin-bottom:20px}
+.pc-label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px}
+.pc-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.pc-fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--green));border-radius:2px;transition:width .8s ease;width:60%}
+
+/* ══ ARIA SETTINGS ══ */
+.model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.model-card{background:rgba(0,0,0,.2);border:2px solid var(--border);border-radius:3px;padding:14px;cursor:pointer;transition:all .3s}
+.model-card:hover{border-color:var(--border2)}
+.model-card.active{border-color:var(--cyan);background:rgba(0,255,221,.04);box-shadow:0 0 12px rgba(0,255,221,.1)}
+.model-name{font-family:var(--font-head);font-size:10px;letter-spacing:1px;color:var(--text);margin-bottom:4px}
+.model-tag{font-family:var(--font-mono);font-size:9px;padding:2px 6px;border-radius:2px}
+.mt-fast{background:rgba(0,255,136,.1);border:1px solid var(--green3);color:var(--green)}
+.mt-smart{background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.3);color:var(--purple)}
+.mt-pro{background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.2);color:var(--amber)}
+.model-desc{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:6px;line-height:1.5}
+.range-wrap{margin-bottom:14px}
+.range-header{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:6px}
+.range-val{color:var(--cyan)}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;-moz-appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 0 6px rgba(0,255,136,.5);border:none}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 0 6px rgba(0,255,136,.5);border:none}
+
+/* ══ DANGER ZONE ══ */
+.danger-card{background:rgba(255,51,85,.04);border:1px solid rgba(255,51,85,.2);border-radius:4px;padding:22px;margin-bottom:16px}
+.danger-card .card-title{color:var(--red)}
+.danger-card .card-title::before{background:var(--red);box-shadow:0 0 4px var(--red)}
+.danger-action{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,51,85,.1);gap:16px}
+.danger-action:last-child{border-bottom:none;padding-bottom:0}
+.da-info{flex:1}
+.da-title{font-size:13px;color:var(--text);font-weight:600}
+.da-desc{font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-top:3px}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,255,136,.18);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,255,136,.35)}
+
+/* ══ MOBILE NAV TABS ══ */
+.mobile-sn{display:none;overflow-x:auto;scrollbar-width:none;gap:4px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.mobile-sn::-webkit-scrollbar{display:none}
+@media(max-width:768px){.mobile-sn{display:flex}}
+.msn-item{flex-shrink:0;background:none;border:1px solid var(--border);color:var(--text2);padding:5px 12px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:2px;text-transform:uppercase;white-space:nowrap}
+.msn-item.active{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.08)}
+
+/* ══ HAMBURGER BUTTON ══ */
+.hamburger-btn{background:none;border:1px solid var(--border2);color:var(--text2);width:36px;height:36px;border-radius:3px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;transition:all .3s;flex-shrink:0;position:relative;overflow:hidden}
+.hamburger-btn::before{content:'';position:absolute;inset:0;background:rgba(0,255,136,.05);opacity:0;transition:opacity .3s}
+.hamburger-btn:hover::before{opacity:1}
+.hamburger-btn:hover{border-color:var(--green);color:var(--green);box-shadow:0 0 12px rgba(0,255,136,.2)}
+.hb-line{width:18px;height:2px;background:currentColor;border-radius:1px;transition:all .35s cubic-bezier(.4,0,.2,1);transform-origin:center}
+.hamburger-btn.open .hb-line:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger-btn.open .hb-line:nth-child(2){opacity:0;transform:scaleX(0)}
+.hamburger-btn.open .hb-line:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.hamburger-btn.open{border-color:var(--green);color:var(--green);box-shadow:0 0 16px rgba(0,255,136,.25)}
+
+/* ══ NAV DRAWER OVERLAY ══ */
+.nav-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+.nav-drawer-overlay.open{opacity:1;pointer-events:all}
+
+/* ══ NAV DRAWER ══ */
+.nav-drawer{position:fixed;top:0;left:-320px;width:300px;height:100vh;background:rgba(6,13,20,.98);border-right:1px solid var(--border2);z-index:501;transition:left .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;box-shadow:4px 0 40px rgba(0,0,0,.6);display:flex;flex-direction:column}
+[data-theme="light"] .nav-drawer{background:rgba(232,240,247,.98)}
+.nav-drawer.open{left:0}
+.nav-drawer::before{content:'';position:absolute;top:0;right:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(0,255,136,.4) 30%,rgba(0,255,136,.4) 70%,transparent);pointer-events:none}
+
+.nd-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.nd-title{font-family:var(--font-head);font-size:11px;color:var(--green);letter-spacing:3px;text-shadow:0 0 16px rgba(0,255,136,.4)}
+.nd-close{background:none;border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:2px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nd-close:hover{border-color:var(--red);color:var(--red)}
+
+.nd-section-label{font-family:var(--font-mono);font-size:8px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:14px 20px 6px;border-bottom:1px solid rgba(255,255,255,.03)}
+.nd-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:all .25s;border-left:3px solid transparent;color:var(--text2);font-size:13px;font-family:var(--font-main);letter-spacing:.5px;position:relative}
+.nd-item::after{content:'';position:absolute;right:16px;width:6px;height:6px;border-top:1px solid var(--text3);border-right:1px solid var(--text3);transform:rotate(45deg);opacity:.4;transition:all .3s}
+.nd-item:hover{color:var(--text);background:rgba(0,255,136,.04);border-left-color:rgba(0,255,136,.3)}
+.nd-item:hover::after{border-color:var(--green);opacity:.8;transform:rotate(45deg) translateX(3px)}
+.nd-item.active{color:var(--green);background:rgba(0,255,136,.07);border-left-color:var(--green)}
+.nd-item.active::after{border-color:var(--green);opacity:1}
+.nd-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.nd-badge{margin-left:auto;margin-right:18px;font-family:var(--font-mono);font-size:7px;padding:2px 5px;background:rgba(255,51,85,.15);border:1px solid var(--red2);color:var(--red);border-radius:2px}
+.nd-divider{height:1px;background:var(--border);margin:6px 20px}
+
+/* ══ 3D CARD EFFECTS ══ */
+.settings-card{transform-style:preserve-3d;transition:border-color .2s,box-shadow .3s,transform .25s}
+.settings-card:hover{transform:perspective(800px) rotateX(0.8deg) translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 24px rgba(0,255,136,.06),inset 0 1px 0 rgba(0,255,136,.08)}
+
+.danger-card:hover{transform:perspective(800px) rotateX(0.8deg) translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 20px rgba(255,51,85,.08)}
+
+/* ══ 3D MODEL CARDS ══ */
+.model-card{transform-style:preserve-3d;transition:all .3s}
+.model-card:hover{transform:perspective(600px) rotateY(-2deg) rotateX(1deg) translateZ(4px);box-shadow:6px 6px 20px rgba(0,0,0,.5),-1px -1px 8px rgba(0,255,136,.08)}
+.model-card.active{transform:perspective(600px) rotateY(-1deg) rotateX(0.5deg) translateZ(6px)}
+
+/* ══ 3D SEC SCORE ══ */
+.sec-score-num{text-shadow:2px 4px 12px rgba(0,0,0,.8),0 0 30px currentColor,-1px -1px 0 rgba(0,0,0,.5);filter:drop-shadow(0 2px 8px currentColor)}
+
+/* ══ 3D NAV SIDEBAR ITEMS ══ */
+.sn-item{transform:perspective(400px);transition:all .2s,transform .2s}
+.sn-item:hover{transform:perspective(400px) translateZ(4px) translateX(2px)}
+.sn-item.active{transform:perspective(400px) translateZ(6px) translateX(3px)}
+
+/* ══ 3D TOGGLE ══ */
+.toggle-slider{box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(255,255,255,.04)}
+.toggle input:checked + .toggle-slider{box-shadow:inset 0 2px 4px rgba(0,0,0,.3),0 0 12px rgba(0,255,136,.3),0 1px 0 rgba(0,255,136,.1)}
+
+/* ══ 3D THEME CARDS ══ */
+.theme-card{transform-style:preserve-3d;transition:all .3s}
+.theme-card:hover{transform:perspective(500px) rotateY(-3deg) rotateX(2deg) scale(1.01);box-shadow:8px 8px 24px rgba(0,0,0,.5)}
+.theme-card.selected{transform:perspective(500px) rotateY(-2deg) rotateX(1deg) scale(1.02);box-shadow:0 0 20px rgba(0,255,136,.2),8px 8px 24px rgba(0,0,0,.5)}
+
+/* ══ 3D ACCENT OPTS ══ */
+.accent-opt{box-shadow:0 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2),0 0 0 2px rgba(0,0,0,.3);transition:all .25s}
+.accent-opt:hover{transform:scale(1.12) translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.3),0 0 12px currentColor}
+.accent-opt.active{box-shadow:0 4px 10px rgba(0,0,0,.5),0 0 0 3px #fff,0 0 16px currentColor}
+
+/* ══ 3D BUTTON DEPTH ══ */
+.btn-primary{box-shadow:0 4px 0 rgba(0,0,0,.4),0 6px 16px rgba(0,255,136,.2);transform:translateY(0);transition:all .2s}
+.btn-primary:hover{box-shadow:0 6px 0 rgba(0,0,0,.4),0 8px 24px rgba(0,255,136,.35);transform:translateY(-2px)}
+.btn-primary:active{box-shadow:0 2px 0 rgba(0,0,0,.4),0 3px 10px rgba(0,255,136,.2);transform:translateY(2px)}
+
+/* ══ 3D SESSION TABLE ══ */
+.session-table tr:hover td{background:rgba(0,255,136,.03);transform:perspective(800px) translateZ(2px)}
+
+/* ══ 3D STAT BARS ══ */
+.sec-bar{box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 0 12px rgba(0,0,0,.3);border-radius:6px}
+.pc-bar{box-shadow:inset 0 2px 4px rgba(0,0,0,.5);border-radius:4px}
+.pw-bar{box-shadow:inset 0 2px 4px rgba(0,0,0,.5);border-radius:3px}
+.sec-bar-fill{box-shadow:0 0 12px currentColor,0 2px 4px rgba(0,0,0,.4)}
+.pc-fill{box-shadow:0 0 10px rgba(0,255,136,.4)}
+
+/* ══ 3D PAGE HEADER TITLE ══ */
+.page-title{text-shadow:2px 4px 0 rgba(0,0,0,.5),0 0 30px rgba(0,255,136,.25);filter:drop-shadow(0 2px 8px rgba(0,255,136,.15))}
+
+/* ══ 3D SAVE BTN ══ */
+.save-all-btn{box-shadow:0 4px 0 rgba(0,100,60,.8),0 6px 20px rgba(0,255,136,.25);transition:all .2s}
+.save-all-btn:hover{box-shadow:0 6px 0 rgba(0,100,60,.8),0 10px 28px rgba(0,255,136,.4);transform:translateY(-2px)}
+.save-all-btn:active{box-shadow:0 1px 0 rgba(0,100,60,.8),0 2px 8px rgba(0,255,136,.2);transform:translateY(3px)}
+
+/* ══ VERIFICATION BADGE ══ */
+.verify-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:8px;padding:2px 7px;border-radius:2px;margin-left:6px}
+.vb-yes{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);color:var(--green)}
+.vb-no{background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.2);color:var(--amber)}
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<!-- ══════════ NAV ══════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="dot"></div>
+    PRAHARI
+    <span class="vtag">v5.0</span>
+  </div>
+  <div class="nav-tabs">
+    <a href="index.html" class="nav-tab">📊 Dashboard</a>
+    <a href="ai.html" class="nav-tab">🤖 ARIA</a>
+    <a href="index.html" class="nav-tab">🌍 Threat Map</a>
+    <a href="index.html" class="nav-tab">⚖️ CyberLaw</a>
+    <a href="index.html" class="nav-tab">🚨 Report Fraud</a>
+    <button class="nav-tab active">⚙️ Settings</button>
+  </div>
+  <div class="nav-right">
+    <div class="user-avatar-sm" id="navAvatar">👤</div>
+  </div>
+</nav>
+
+<!-- ══════════ MOBILE SECTION TABS ══════════ -->
+<div class="mobile-sn" id="mobileSn">
+  <button class="msn-item active" onclick="switchSection('profile',this)">Profile</button>
+  <button class="msn-item" onclick="switchSection('appearance',this)">Appearance</button>
+  <button class="msn-item" onclick="switchSection('security',this)">Security</button>
+  <button class="msn-item" onclick="switchSection('notifications',this)">Alerts</button>
+  <button class="msn-item" onclick="switchSection('aria',this)">ARIA</button>
+  <button class="msn-item" onclick="switchSection('sessions',this)">Sessions</button>
+  <button class="msn-item" onclick="switchSection('privacy',this)">Privacy</button>
+  <button class="msn-item" onclick="switchSection('danger',this)">Danger</button>
+</div>
+
+<!-- ══════════ SETTINGS LAYOUT ══════════ -->
+<div class="settings-layout">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="settings-nav">
+    <div class="sn-title">⚙ CONFIGURATION</div>
+
+    <div class="sn-item active" onclick="switchSection('profile',this)" data-section="profile">
+      <span class="sn-icon">👤</span> Profile
+    </div>
+    <div class="sn-item" onclick="switchSection('appearance',this)" data-section="appearance">
+      <span class="sn-icon">🎨</span> Appearance
+    </div>
+    <div class="sn-divider"></div>
+
+    <div class="sn-item" onclick="switchSection('security',this)" data-section="security">
+      <span class="sn-icon">🔐</span> Security
+      <span class="sn-badge">2FA</span>
+    </div>
+    <div class="sn-item" onclick="switchSection('notifications',this)" data-section="notifications">
+      <span class="sn-icon">🔔</span> Notifications
+    </div>
+    <div class="sn-divider"></div>
+
+    <div class="sn-item" onclick="switchSection('aria',this)" data-section="aria">
+      <span class="sn-icon">🤖</span> ARIA Settings
+    </div>
+    <div class="sn-item" onclick="switchSection('sessions',this)" data-section="sessions">
+      <span class="sn-icon">🖥️</span> Sessions
+    </div>
+    <div class="sn-divider"></div>
+
+    <div class="sn-item" onclick="switchSection('privacy',this)" data-section="privacy">
+      <span class="sn-icon">🛡️</span> Privacy & Data
+    </div>
+    <div class="sn-item" onclick="switchSection('danger',this)" data-section="danger">
+      <span class="sn-icon">⚠️</span> Danger Zone
+    </div>
+  </nav>
+
+  <!-- ══ MAIN ══ -->
+  <div class="settings-main">
+    <div class="page-header">
+      <div>
+        <div class="page-title" id="pageTitle">PROFILE</div>
+        <div class="page-sub" id="pageSub">MANAGE YOUR IDENTITY AND PERSONAL DETAILS</div>
+      </div>
+      <button class="save-all-btn" onclick="saveAll()">💾 SAVE CHANGES</button>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: PROFILE
+    ════════════════════════ -->
+    <div class="settings-section active" id="section-profile">
+
+      <div class="profile-complete">
+        <div class="pc-label">
+          <span>PROFILE COMPLETION</span>
+          <span id="profilePct">60%</span>
+        </div>
+        <div class="pc-bar"><div class="pc-fill" id="profileBar"></div></div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">OPERATOR IDENTITY</div>
+        <div class="profile-hero">
+          <!-- Avatar -->
+          <div class="avatar-zone">
+            <div class="avatar-frame">
+              <div class="avatar-img" onclick="document.getElementById('avatarInput').click()" title="Click to upload photo">
+                <span id="avatarEmoji">👤</span>
+                <img id="avatarPreview" alt="Profile Photo">
+                <div class="avatar-overlay">📷</div>
+              </div>
+              <div class="avatar-ring"></div>
+            </div>
+            <div class="avatar-status"><span class="status-dot"></span>ONLINE</div>
+            <label class="avatar-upload-btn" for="avatarInput">📁 UPLOAD PHOTO</label>
+            <input type="file" id="avatarInput" class="avatar-input" accept="image/*" onchange="handleAvatarUpload(this)">
+          </div>
+
+          <!-- Fields -->
+          <div class="profile-fields">
+            <div class="form-row">
+              <div class="field">
+                <div class="field-label">First Name</div>
+                <input class="field-input" type="text" id="firstName" placeholder="Rati" value="">
+              </div>
+              <div class="field">
+                <div class="field-label">Last Name</div>
+                <input class="field-input" type="text" id="lastName" placeholder="Mohapatra" value="">
+              </div>
+            </div>
+            <div class="form-row single">
+              <div class="field">
+                <div class="field-label">
+                  Display Name / Handle
+                  <span class="verify-badge vb-yes">✓ UNIQUE</span>
+                </div>
+                <input class="field-input" type="text" id="handle" placeholder="@prahari_ops" value="">
+              </div>
+            </div>
+            <div class="form-row single">
+              <div class="field">
+                <div class="field-label">
+                  Email Address
+                  <span class="verify-badge vb-no" id="emailVerifyBadge">⚠ UNVERIFIED</span>
+                </div>
+                <input class="field-input" type="email" id="email" placeholder="operator@prahari.in" value="">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <div class="field-label">
+                  Phone Number
+                  <span class="verify-badge vb-no" id="phoneVerifyBadge">⚠ UNVERIFIED</span>
+                </div>
+                <input class="field-input" type="tel" id="phone" placeholder="+91 XXXXX XXXXX" value="">
+              </div>
+              <div class="field">
+                <div class="field-label">Organization</div>
+                <input class="field-input" type="text" id="org" placeholder="PRAHARI-OPS / CERT-In" value="">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <div class="field-label">Role / Designation</div>
+                <select class="field-input field-select" id="role">
+                  <option value="">Select Role</option>
+                  <option>Security Analyst</option>
+                  <option>Penetration Tester</option>
+                  <option>SOC Engineer</option>
+                  <option>CISO / Security Lead</option>
+                  <option>Incident Responder</option>
+                  <option>Law Enforcement</option>
+                  <option>Researcher</option>
+                  <option>Student</option>
+                </select>
+              </div>
+              <div class="field">
+                <div class="field-label">Time Zone</div>
+                <select class="field-input field-select" id="timezone">
+                  <option value="IST" selected>IST — Asia/Kolkata (+5:30)</option>
+                  <option value="UTC">UTC +0:00</option>
+                  <option value="EST">EST — US/Eastern (-5:00)</option>
+                  <option value="PST">PST — US/Pacific (-8:00)</option>
+                  <option value="CET">CET — Europe/Berlin (+1:00)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row single">
+              <div class="field">
+                <div class="field-label">
+                  Bio
+                  <span class="field-hint" id="bioCount">0/200</span>
+                </div>
+                <textarea class="field-input" id="bio" rows="3" placeholder="Cybersecurity professional specialising in threat intelligence…" maxlength="200" oninput="document.getElementById('bioCount').textContent=this.value.length+'/200'"></textarea>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary" onclick="saveProfile()">✔ SAVE PROFILE</button>
+              <button class="btn btn-blue btn-sm" onclick="verifyEmail()">📧 VERIFY EMAIL</button>
+              <button class="btn btn-blue btn-sm" onclick="verifyPhone()">📱 VERIFY PHONE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: APPEARANCE
+    ════════════════════════ -->
+    <div class="settings-section" id="section-appearance">
+
+      <div class="settings-card">
+        <div class="card-title">DISPLAY THEME</div>
+        <div class="theme-grid">
+          <div class="theme-card selected" id="theme-dark" onclick="setTheme('dark')">
+            <div class="theme-preview theme-preview-dark">
+              <div class="tp-bar tp-accent"></div>
+              <div class="tp-bar tp-muted"></div>
+              <div class="tp-bar tp-border"></div>
+            </div>
+            <div class="theme-name">⬛ DARK CYBER</div>
+            <div class="theme-tag">Default · OLED-friendly · Low eye strain</div>
+          </div>
+          <div class="theme-card" id="theme-light" onclick="setTheme('light')">
+            <div class="theme-preview theme-preview-light">
+              <div class="tp-bar tp-accent-l"></div>
+              <div class="tp-bar tp-muted-l"></div>
+              <div class="tp-bar tp-border-l"></div>
+            </div>
+            <div class="theme-name">⬜ LIGHT OPS</div>
+            <div class="theme-tag">High contrast · Outdoor use · Accessibility</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">ACCENT COLOR</div>
+        <div class="field-label" style="margin-bottom:10px">PRIMARY ACCENT — controls highlights, buttons & borders</div>
+        <div class="accent-grid" id="accentGrid">
+          <div class="accent-opt active" style="background:#00ff88;color:#00ff88" onclick="setAccent('#00ff88','#00cc6a',this)" title="Matrix Green"></div>
+          <div class="accent-opt" style="background:#00aaff;color:#00aaff" onclick="setAccent('#00aaff','#0088cc',this)" title="Cyber Blue"></div>
+          <div class="accent-opt" style="background:#c084fc;color:#c084fc" onclick="setAccent('#c084fc','#9333ea',this)" title="Neon Purple"></div>
+          <div class="accent-opt" style="background:#ffaa00;color:#ffaa00" onclick="setAccent('#ffaa00','#cc8800',this)" title="Warning Amber"></div>
+          <div class="accent-opt" style="background:#00ffdd;color:#00ffdd" onclick="setAccent('#00ffdd','#00ccaa',this)" title="Aqua Cyan"></div>
+          <div class="accent-opt" style="background:#ff6644;color:#ff6644" onclick="setAccent('#ff6644','#cc4422',this)" title="Alert Orange"></div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">INTERFACE OPTIONS</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Scanline Effect</div>
+            <div class="toggle-desc">CRT-style scanlines overlay — visual flair</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-scanlines" checked onchange="toggleScanlines(this)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Animated Background Canvas</div>
+            <div class="toggle-desc">Particle/grid background animations (GPU-intensive)</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-canvas" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">News Ticker</div>
+            <div class="toggle-desc">Scrolling threat feed at the top of the dashboard</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-ticker" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Compact Mode</div>
+            <div class="toggle-desc">Reduce padding and spacing for denser information layout</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-compact"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Reduce Motion</div>
+            <div class="toggle-desc">Disable non-essential animations for accessibility</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-motion"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">FONT SIZE</div>
+        <div class="range-wrap">
+          <div class="range-header"><span>Interface Font Size</span><span class="range-val" id="fontSizeVal">15px</span></div>
+          <input type="range" min="12" max="20" value="15" oninput="document.getElementById('fontSizeVal').textContent=this.value+'px';document.documentElement.style.fontSize=this.value+'px'">
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: SECURITY
+    ════════════════════════ -->
+    <div class="settings-section" id="section-security">
+
+      <div class="settings-card">
+        <div class="card-title">SECURITY SCORE</div>
+        <div class="sec-meter">
+          <div class="sec-score">
+            <div class="sec-score-num" id="secScore" style="color:var(--amber)">62</div>
+            <div>
+              <div class="sec-score-label">/ 100  ·  MODERATE</div>
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:3px">Enable 2FA and verify contact details to improve</div>
+            </div>
+          </div>
+          <div class="sec-bar"><div class="sec-bar-fill" id="secBarFill" style="width:62%;background:linear-gradient(90deg,var(--amber),var(--amber2))"></div></div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">CHANGE PASSWORD</div>
+        <div class="alert alert-info">🛡️ Passwords are hashed with bcrypt (cost 12). Never stored in plain text.</div>
+        <div class="form-row single">
+          <div class="field">
+            <div class="field-label">Current Password</div>
+            <div class="pw-wrap">
+              <input class="field-input" type="password" id="pwCurrent" placeholder="Enter current password">
+              <button class="pw-eye" onclick="togglePw('pwCurrent',this)">👁</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <div class="field-label">New Password</div>
+            <div class="pw-wrap">
+              <input class="field-input" type="password" id="pwNew" placeholder="Min. 12 characters" oninput="evalPassword(this.value)">
+              <button class="pw-eye" onclick="togglePw('pwNew',this)">👁</button>
+            </div>
+            <div class="pw-strength">
+              <div class="pw-bar"><div class="pw-bar-fill" id="pwBar"></div></div>
+              <div class="pw-label" id="pwLabel" style="color:var(--text3)">Enter a strong password</div>
+            </div>
+            <div class="pw-criteria">
+              <div class="crit" id="crit-len">Min 12 characters</div>
+              <div class="crit" id="crit-upper">Uppercase letter</div>
+              <div class="crit" id="crit-lower">Lowercase letter</div>
+              <div class="crit" id="crit-num">Number</div>
+              <div class="crit" id="crit-sym">Special character</div>
+              <div class="crit" id="crit-no-common">Not a common word</div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Confirm New Password</div>
+            <div class="pw-wrap">
+              <input class="field-input" type="password" id="pwConfirm" placeholder="Repeat new password">
+              <button class="pw-eye" onclick="togglePw('pwConfirm',this)">👁</button>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="changePassword()">🔑 UPDATE PASSWORD</button>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">TWO-FACTOR AUTHENTICATION</div>
+        <div class="alert alert-warn">⚠ 2FA is currently DISABLED. Your account is at higher risk.</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Authenticator App (TOTP)</div>
+            <div class="toggle-desc">Google Authenticator, Authy, Microsoft Authenticator</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-totp" onchange="toggle2FA(this,'totp')"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">SMS OTP</div>
+            <div class="toggle-desc">One-time code via registered mobile number</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-sms" onchange="toggle2FA(this,'sms')"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Email OTP</div>
+            <div class="toggle-desc">One-time code sent to your email address</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="tog-email2fa" onchange="toggle2FA(this,'email')"><span class="toggle-slider"></span></label>
+        </div>
+        <div id="totpSetup" style="display:none;margin-top:14px" class="alert alert-info">
+          📲 Scan the QR code below with your authenticator app, then enter the 6-digit code to enable TOTP.
+          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+            <div style="width:100px;height:100px;background:white;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-family:var(--font-mono);text-align:center;padding:8px">QR CODE PLACEHOLDER</div>
+            <div style="flex:1;min-width:160px">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-bottom:6px">ENTER CODE FROM APP</div>
+              <input class="field-input" type="text" id="totpCode" placeholder="000000" maxlength="6" style="letter-spacing:8px;font-size:18px;text-align:center">
+              <button class="btn btn-outline btn-sm" style="margin-top:8px;width:100%" onclick="verifyTOTP()">VERIFY & ENABLE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">LOGIN SETTINGS</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Login Alert Emails</div>
+            <div class="toggle-desc">Email notification on every new sign-in</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Suspicious Login Block</div>
+            <div class="toggle-desc">Auto-block logins from unrecognized locations</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Biometric Login</div>
+            <div class="toggle-desc">Use fingerprint or face ID (if supported by device)</div>
+          </div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="form-row" style="margin-top:14px">
+          <div class="field">
+            <div class="field-label">Auto-Logout After (minutes)</div>
+            <select class="field-input field-select" id="autoLogout">
+              <option value="15">15 minutes</option>
+              <option value="30" selected>30 minutes</option>
+              <option value="60">1 hour</option>
+              <option value="120">2 hours</option>
+              <option value="0">Never</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="field-label">Max Concurrent Sessions</div>
+            <select class="field-input field-select" id="maxSessions">
+              <option value="1">1 device</option>
+              <option value="3" selected>3 devices</option>
+              <option value="5">5 devices</option>
+              <option value="0">Unlimited</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: NOTIFICATIONS
+    ════════════════════════ -->
+    <div class="settings-section" id="section-notifications">
+
+      <div class="settings-card">
+        <div class="card-title">NOTIFICATION CHANNELS</div>
+        <div class="notif-channels">
+          <div class="notif-channel on" id="nc-email" onclick="toggleChannel('email')">
+            <div class="nc-icon">📧</div>
+            <div class="nc-name">EMAIL</div>
+            <div class="nc-status on" id="ncs-email">● ACTIVE</div>
+          </div>
+          <div class="notif-channel" id="nc-sms" onclick="toggleChannel('sms')">
+            <div class="nc-icon">📱</div>
+            <div class="nc-name">SMS</div>
+            <div class="nc-status off" id="ncs-sms">○ INACTIVE</div>
+          </div>
+          <div class="notif-channel on" id="nc-push" onclick="toggleChannel('push')">
+            <div class="nc-icon">🔔</div>
+            <div class="nc-name">PUSH</div>
+            <div class="nc-status on" id="ncs-push">● ACTIVE</div>
+          </div>
+          <div class="notif-channel" id="nc-webhook" onclick="toggleChannel('webhook')">
+            <div class="nc-icon">🔗</div>
+            <div class="nc-name">WEBHOOK</div>
+            <div class="nc-status off" id="ncs-webhook">○ INACTIVE</div>
+          </div>
+        </div>
+        <div id="webhookFields" style="display:none">
+          <div class="field" style="margin-bottom:10px">
+            <div class="field-label">Webhook URL</div>
+            <input class="field-input" type="url" id="webhookUrl" placeholder="https://your-server.com/prahari-alerts">
+          </div>
+          <div class="field">
+            <div class="field-label">Secret Token</div>
+            <input class="field-input" type="text" id="webhookSecret" placeholder="Optional HMAC secret">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">ALERT CATEGORIES</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">🔴 Critical Threats</div>
+            <div class="toggle-desc">CVE exploits, zero-days, nation-state attacks — always on</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">🟠 High-Severity Advisories</div>
+            <div class="toggle-desc">CERT-In advisories, CSIRT bulletins</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">🟡 Threat Intel Updates</div>
+            <div class="toggle-desc">New IOCs, threat actor activity, campaign updates</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">📊 Weekly Digest</div>
+            <div class="toggle-desc">Summary of the week's top threats every Monday 08:00 IST</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">🔐 Account Security Events</div>
+            <div class="toggle-desc">Login alerts, password changes, 2FA events</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">💡 Platform Updates</div>
+            <div class="toggle-desc">New PRAHARI features, ARIA model upgrades</div>
+          </div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">QUIET HOURS</div>
+        <div class="form-row">
+          <div class="field">
+            <div class="field-label">Do Not Disturb — Start</div>
+            <input class="field-input" type="time" id="dndStart" value="23:00">
+          </div>
+          <div class="field">
+            <div class="field-label">Do Not Disturb — End</div>
+            <input class="field-input" type="time" id="dndEnd" value="07:00">
+          </div>
+        </div>
+        <div class="alert alert-info" style="margin-top:0">ℹ️ Critical threat alerts will still be delivered during quiet hours.</div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: ARIA SETTINGS
+    ════════════════════════ -->
+    <div class="settings-section" id="section-aria">
+
+      <div class="settings-card">
+        <div class="card-title">AI MODEL SELECTION</div>
+        <div class="model-grid">
+          <div class="model-card" onclick="selectModel('gemini-flash',this)">
+            <div class="model-name">Gemini Flash</div>
+            <span class="model-tag mt-fast">⚡ FAST</span>
+            <div class="model-desc">Gemini 2.0 Flash — best for quick queries, low latency</div>
+          </div>
+          <div class="model-card active" onclick="selectModel('gemini-pro',this)">
+            <div class="model-name">Gemini Pro</div>
+            <span class="model-tag mt-smart">🧠 SMART</span>
+            <div class="model-desc">Gemini 1.5 Pro — balanced intelligence &amp; speed</div>
+          </div>
+          <div class="model-card" onclick="selectModel('gpt4o',this)">
+            <div class="model-name">GPT-4o</div>
+            <span class="model-tag mt-pro">👑 PRO</span>
+            <div class="model-desc">OpenAI GPT-4o — highest accuracy for complex analysis</div>
+          </div>
+          <div class="model-card" onclick="selectModel('claude',this)">
+            <div class="model-name">Claude Sonnet</div>
+            <span class="model-tag mt-smart">🛡️ SAFE</span>
+            <div class="model-desc">Anthropic Claude — safety-focused, nuanced reasoning</div>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="field">
+            <div class="field-label">Custom Model String <span class="field-hint">(overrides selection above)</span></div>
+            <input class="field-input" type="text" id="customModel" placeholder="e.g. gemini-2.0-flash / gpt-4o-mini">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">GENERATION PARAMETERS</div>
+        <div class="range-wrap">
+          <div class="range-header"><span>Temperature (creativity)</span><span class="range-val" id="tempVal">0.7</span></div>
+          <input type="range" min="0" max="2" step="0.05" value="0.7" oninput="document.getElementById('tempVal').textContent=parseFloat(this.value).toFixed(2)">
+        </div>
+        <div class="range-wrap">
+          <div class="range-header"><span>Max Output Tokens</span><span class="range-val" id="tokensVal">1024</span></div>
+          <input type="range" min="256" max="4096" step="64" value="1024" oninput="document.getElementById('tokensVal').textContent=this.value">
+        </div>
+        <div class="range-wrap">
+          <div class="range-header"><span>History Context Window (messages)</span><span class="range-val" id="histVal">20</span></div>
+          <input type="range" min="4" max="40" step="2" value="20" oninput="document.getElementById('histVal').textContent=this.value">
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">ARIA BEHAVIOUR</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Streaming Responses</div>
+            <div class="toggle-desc">Show ARIA's answer as it types (real-time stream)</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Auto-Detect Query Mode</div>
+            <div class="toggle-desc">Automatically switch Defensive/Offensive based on query intent</div>
+          </div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Citation Mode</div>
+            <div class="toggle-desc">Include Indian law sections and MITRE ATT&amp;CK references</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Conversation Memory</div>
+            <div class="toggle-desc">Remember context across sessions (stored locally)</div>
+          </div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Safe Mode Override</div>
+            <div class="toggle-desc">Extra guardrails — block all offensive-mode requests</div>
+          </div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">API CONFIGURATION</div>
+        <div class="form-row">
+          <div class="field">
+            <div class="field-label">API Base URL</div>
+            <input class="field-input" type="url" id="apiBaseUrl" placeholder="https://generativelanguage.googleapis.com/v1beta/openai/" value="">
+          </div>
+          <div class="field">
+            <div class="field-label">Provider</div>
+            <select class="field-input field-select" id="apiProvider" onchange="updateProviderUrl()">
+              <option value="google">Google (Gemini)</option>
+              <option value="openai">OpenAI (GPT)</option>
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openrouter">OpenRouter</option>
+              <option value="groq">Groq</option>
+              <option value="together">Together AI</option>
+            </select>
+          </div>
+        </div>
+        <div class="alert alert-success">🔒 API keys are stored server-side in .env — never in the browser.</div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: SESSIONS
+    ════════════════════════ -->
+    <div class="settings-section" id="section-sessions">
+
+      <div class="settings-card">
+        <div class="card-title">ACTIVE SESSIONS</div>
+        <div style="overflow-x:auto">
+          <table class="session-table">
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th>Location</th>
+                <th>Last Active</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="sessionsBody">
+              <tr>
+                <td>🖥️ Chrome · Windows 11</td>
+                <td>🇮🇳 Cuttack, Odisha</td>
+                <td>Now</td>
+                <td><span class="session-badge sb-current">CURRENT</span></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>📱 Safari · iOS 17</td>
+                <td>🇮🇳 Bhubaneswar, Odisha</td>
+                <td>2h ago</td>
+                <td><span class="session-badge sb-old">ACTIVE</span></td>
+                <td><button class="session-kill" onclick="killSession(this)">REVOKE</button></td>
+              </tr>
+              <tr>
+                <td>🖥️ Firefox · Ubuntu 22</td>
+                <td>🇮🇳 New Delhi</td>
+                <td>3d ago</td>
+                <td><span class="session-badge sb-old">IDLE</span></td>
+                <td><button class="session-kill" onclick="killSession(this)">REVOKE</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-danger" onclick="killAllSessions()">🚫 REVOKE ALL OTHER SESSIONS</button>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">LOGIN HISTORY</div>
+        <table class="session-table">
+          <thead>
+            <tr><th>Date/Time (IST)</th><th>IP Address</th><th>Location</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>2025-05-11 09:32</td><td>182.74.XX.XX</td><td>🇮🇳 Cuttack</td><td style="color:var(--green)">✓ SUCCESS</td></tr>
+            <tr><td>2025-05-10 21:14</td><td>182.74.XX.XX</td><td>🇮🇳 Cuttack</td><td style="color:var(--green)">✓ SUCCESS</td></tr>
+            <tr><td>2025-05-09 14:05</td><td>103.21.XX.XX</td><td>🇮🇳 New Delhi</td><td style="color:var(--amber)">⚠ FLAGGED</td></tr>
+            <tr><td>2025-05-08 08:50</td><td>45.33.XX.XX</td><td>🇺🇸 Virginia, US</td><td style="color:var(--red)">✗ BLOCKED</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: PRIVACY & DATA
+    ════════════════════════ -->
+    <div class="settings-section" id="section-privacy">
+
+      <div class="settings-card">
+        <div class="card-title">DATA USAGE & PRIVACY</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Anonymized Analytics</div>
+            <div class="toggle-desc">Help improve PRAHARI with anonymized usage data (no PII)</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">ARIA Conversation Logging</div>
+            <div class="toggle-desc">Store conversation history for your own reference (local only)</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">AI Training Opt-Out</div>
+            <div class="toggle-desc">Do not use my conversations to improve AI models</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Share Threat Intelligence</div>
+            <div class="toggle-desc">Contribute anonymized threat data to community feed</div>
+          </div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">DATA RIGHTS (DPDP ACT 2023)</div>
+        <div class="alert alert-info">ℹ️ Under India's Digital Personal Data Protection Act 2023, you have the right to access, correct, and erase your data.</div>
+        <div class="btn-row">
+          <button class="btn btn-outline btn-sm" onclick="exportData()">📦 EXPORT MY DATA</button>
+          <button class="btn btn-blue btn-sm" onclick="requestCorrection()">✏️ REQUEST DATA CORRECTION</button>
+          <button class="btn btn-danger btn-sm" onclick="requestErasure()">🗑️ REQUEST DATA ERASURE</button>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-title">GDPR / CCPA (INTERNATIONAL)</div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Cookie Consent</div>
+            <div class="toggle-desc">Allow non-essential cookies for enhanced features</div>
+          </div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Cross-Border Data Transfer</div>
+            <div class="toggle-desc">Allow data to be processed on international AI infrastructure</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         SECTION: DANGER ZONE
+    ════════════════════════ -->
+    <div class="settings-section" id="section-danger">
+
+      <div class="alert alert-danger">⛔ Actions in this section are IRREVERSIBLE or have serious security implications. Proceed with extreme caution.</div>
+
+      <div class="danger-card">
+        <div class="card-title">⚠ DANGER ZONE</div>
+
+        <div class="danger-action">
+          <div class="da-info">
+            <div class="da-title">Clear ARIA Conversation History</div>
+            <div class="da-desc">Permanently delete all stored chat logs from ARIA. Cannot be undone.</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDanger('clearHistory','Clear all ARIA conversation history?')">🗑️ CLEAR</button>
+        </div>
+
+        <div class="danger-action">
+          <div class="da-info">
+            <div class="da-title">Reset All Settings</div>
+            <div class="da-desc">Restore all settings to factory defaults. Profile data is retained.</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDanger('resetSettings','Reset ALL settings to defaults?')">🔄 RESET</button>
+        </div>
+
+        <div class="danger-action">
+          <div class="da-info">
+            <div class="da-title">Revoke All API Keys</div>
+            <div class="da-desc">Invalidate all generated API tokens. You will need to regenerate them.</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDanger('revokeKeys','Revoke ALL API keys immediately?')">🔑 REVOKE</button>
+        </div>
+
+        <div class="danger-action">
+          <div class="da-info">
+            <div class="da-title">Deactivate Account</div>
+            <div class="da-desc">Temporarily disable your account. You can reactivate by logging in again.</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDanger('deactivate','Deactivate your PRAHARI account?')">💤 DEACTIVATE</button>
+        </div>
+
+        <div class="danger-action" style="border-bottom:none">
+          <div class="da-info">
+            <div class="da-title" style="color:var(--red)">⛔ DELETE ACCOUNT</div>
+            <div class="da-desc">Permanently delete your account and ALL associated data. This CANNOT be undone. Under DPDP Act 2023 §13, this is your right to erasure.</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete()">💀 DELETE</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /settings-main -->
+</div><!-- /settings-layout -->
+
+<!-- ── TOAST ── -->
+<div id="toast">✔ Settings saved</div>
+
+<!-- ── CONFIRM MODAL ── -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;display:none;align-items:center;justify-content:center">
+  <div style="background:var(--bg3);border:1px solid var(--red);border-radius:4px;padding:28px;max-width:400px;width:90%;box-shadow:0 0 40px rgba(255,51,85,.2)">
+    <div style="font-family:var(--font-head);font-size:12px;color:var(--red);letter-spacing:2px;margin-bottom:14px">⚠ CONFIRM ACTION</div>
+    <div id="confirmMsg" style="font-family:var(--font-mono);font-size:12px;color:var(--text);margin-bottom:20px;line-height:1.6"></div>
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:10px">Type <strong style="color:var(--red)">CONFIRM</strong> to proceed:</div>
+    <input class="field-input" type="text" id="confirmInput" placeholder="CONFIRM" style="margin-bottom:14px;letter-spacing:2px">
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-danger" style="flex:1" id="confirmBtn" onclick="executeConfirm()">PROCEED</button>
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// PRAHARI SETTINGS — JavaScript
+// ════════════════════════════════════════
+
+// ── State
+let currentSection = 'profile';
+let pendingAction = null;
+const state = {};
+
+// ── Load saved settings from localStorage
+function loadSettings() {
+  const saved = localStorage.getItem('prahari_settings');
+  if (saved) {
+    try {
+      const s = JSON.parse(saved);
+      if (s.firstName) document.getElementById('firstName').value = s.firstName;
+      if (s.lastName)  document.getElementById('lastName').value = s.lastName;
+      if (s.handle)    document.getElementById('handle').value = s.handle;
+      if (s.email)     document.getElementById('email').value = s.email;
+      if (s.phone)     document.getElementById('phone').value = s.phone;
+      if (s.org)       document.getElementById('org').value = s.org;
+      if (s.bio)       { document.getElementById('bio').value = s.bio; document.getElementById('bioCount').textContent = s.bio.length+'/200'; }
+      if (s.theme)     setTheme(s.theme, true);
+      if (s.avatar)    setAvatarFromData(s.avatar);
+    } catch(e){}
+  }
+  updateProfileCompletion();
+}
+
+// ── Section switching
+const sectionMeta = {
+  profile:       ['PROFILE','MANAGE YOUR IDENTITY AND PERSONAL DETAILS'],
+  appearance:    ['APPEARANCE','CUSTOMISE THE LOOK AND FEEL OF PRAHARI'],
+  security:      ['SECURITY','HARDEN YOUR ACCOUNT — 2FA, PASSWORDS, SESSIONS'],
+  notifications: ['NOTIFICATIONS','CONFIGURE ALERT CHANNELS AND PREFERENCES'],
+  aria:          ['ARIA SETTINGS','CONFIGURE THE AI INTELLIGENCE ENGINE'],
+  sessions:      ['SESSIONS','VIEW AND MANAGE ACTIVE LOGIN SESSIONS'],
+  privacy:       ['PRIVACY & DATA','DATA RIGHTS UNDER DPDP ACT 2023 & GDPR'],
+  danger:        ['DANGER ZONE','IRREVERSIBLE ACCOUNT ACTIONS — PROCEED WITH CAUTION'],
+};
+
+function switchSection(id, el) {
+  // Hide all
+  document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sn-item').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.msn-item').forEach(s => s.classList.remove('active'));
+
+  document.getElementById('section-'+id).classList.add('active');
+
+  // Highlight sidebar
+  document.querySelectorAll('[data-section="'+id+'"]').forEach(s => s.classList.add('active'));
+
+  // Highlight mobile tab
+  if (el) el.classList.add('active');
+
+  const meta = sectionMeta[id] || ['SETTINGS',''];
+  document.getElementById('pageTitle').textContent = meta[0];
+  document.getElementById('pageSub').textContent   = meta[1];
+  currentSection = id;
+}
+
+// ── Profile save
+function saveProfile() {
+  const fields = ['firstName','lastName','handle','email','phone','org','bio','role','timezone'];
+  const data = {};
+  let filled = 0;
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    if (el) { data[f] = el.value; if (el.value.trim()) filled++; }
+  });
+
+  // Save theme too
+  data.theme = document.documentElement.getAttribute('data-theme');
+
+  // Save avatar if present
+  const img = document.getElementById('avatarPreview');
+  if (img.style.display !== 'none' && img.src) data.avatar = img.src;
+
+  localStorage.setItem('prahari_settings', JSON.stringify(data));
+  updateProfileCompletion();
+  showToast('✔ Profile saved successfully');
+}
+
+function updateProfileCompletion() {
+  const fields = ['firstName','lastName','handle','email','phone','org','bio','role'];
+  let filled = 0;
+  fields.forEach(f => { const el = document.getElementById(f); if (el && el.value.trim()) filled++; });
+  const img = document.getElementById('avatarPreview');
+  if (img && img.style.display !== 'none') filled++;
+  const pct = Math.round((filled / (fields.length + 1)) * 100);
+  document.getElementById('profilePct').textContent = pct + '%';
+  document.getElementById('profileBar').style.width = pct + '%';
+}
+
+// ── Avatar upload
+function handleAvatarUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    setAvatarFromData(e.target.result);
+    updateProfileCompletion();
+    showToast('✔ Photo uploaded');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function setAvatarFromData(src) {
+  const img = document.getElementById('avatarPreview');
+  const em  = document.getElementById('avatarEmoji');
+  const nav = document.getElementById('navAvatar');
+  img.src = src;
+  img.style.display = 'block';
+  em.style.display = 'none';
+  nav.innerHTML = '<img src="'+src+'" style="width:100%;height:100%;object-fit:cover;border-radius:3px">';
+}
+
+// ── Theme toggle
+function setTheme(mode, silent) {
+  document.documentElement.setAttribute('data-theme', mode);
+  document.getElementById('theme-dark').classList.toggle('selected', mode === 'dark');
+  document.getElementById('theme-light').classList.toggle('selected', mode === 'light');
+  if (!silent) showToast('🎨 Theme: ' + (mode === 'dark' ? 'Dark Cyber' : 'Light Ops'));
+}
+
+// ── Accent color
+function setAccent(primary, secondary, el) {
+  document.querySelectorAll('.accent-opt').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  document.documentElement.style.setProperty('--green', primary);
+  document.documentElement.style.setProperty('--green2', secondary);
+  showToast('🎨 Accent updated');
+}
+
+// ── Scanlines
+function toggleScanlines(cb) {
+  document.querySelector('.scanline').style.opacity = cb.checked ? '1' : '0';
+}
+
+// ── Password strength
+const COMMON = ['password','123456','prahari','qwerty','letmein','admin','welcome'];
+function evalPassword(v) {
+  const bar   = document.getElementById('pwBar');
+  const label = document.getElementById('pwLabel');
+  const c = {
+    len:    v.length >= 12,
+    upper:  /[A-Z]/.test(v),
+    lower:  /[a-z]/.test(v),
+    num:    /[0-9]/.test(v),
+    sym:    /[^a-zA-Z0-9]/.test(v),
+    nocom:  !COMMON.some(w => v.toLowerCase().includes(w))
+  };
+  Object.entries(c).forEach(([k,ok]) => {
+    const el = document.getElementById('crit-'+k);
+    if (el) el.classList.toggle('ok', ok);
+  });
+  const score = Object.values(c).filter(Boolean).length;
+  const pct   = Math.round((score/6)*100);
+  const colors = ['#ff3355','#ff6644','#ffaa00','#ffdd00','#88ff44','#00ff88'];
+  const labels = ['','VERY WEAK','WEAK','MODERATE','STRONG','VERY STRONG','FORTRESS'];
+  bar.style.width = pct+'%';
+  bar.style.background = colors[score] || '#00ff88';
+  label.textContent = labels[score] || '';
+  label.style.color  = colors[score] || '#00ff88';
+}
+
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
+function changePassword() {
+  const cur = document.getElementById('pwCurrent').value;
+  const nw  = document.getElementById('pwNew').value;
+  const cf  = document.getElementById('pwConfirm').value;
+  if (!cur || !nw || !cf) { showToast('⚠ Fill all password fields', true); return; }
+  if (nw !== cf) { showToast('✗ Passwords do not match', true); return; }
+  if (nw.length < 12) { showToast('✗ Password too short (min 12 chars)', true); return; }
+  showToast('✔ Password updated successfully');
+  ['pwCurrent','pwNew','pwConfirm'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pwBar').style.width = '0';
+  document.getElementById('pwLabel').textContent = 'Enter a strong password';
+  document.querySelectorAll('.crit').forEach(c => c.classList.remove('ok'));
+}
+
+// ── 2FA toggle
+function toggle2FA(cb, type) {
+  if (type === 'totp' && cb.checked) {
+    document.getElementById('totpSetup').style.display = 'block';
+    showToast('📲 Scan QR code to enable TOTP');
+  } else if (type === 'totp') {
+    document.getElementById('totpSetup').style.display = 'none';
+  }
+  updateSecScore();
+}
+
+function verifyTOTP() {
+  const code = document.getElementById('totpCode').value;
+  if (code.length !== 6 || !/^\d{6}$/.test(code)) { showToast('✗ Enter a valid 6-digit code', true); return; }
+  showToast('✔ TOTP 2FA enabled — account secured');
+  document.getElementById('totpSetup').style.display = 'none';
+  updateSecScore();
+}
+
+// ── Security score update
+function updateSecScore() {
+  const totp  = document.getElementById('tog-totp').checked;
+  const sms   = document.getElementById('tog-sms').checked;
+  const email = document.getElementById('tog-email2fa').checked;
+  const base  = 62;
+  let bonus = 0;
+  if (totp)  bonus += 20;
+  if (sms)   bonus += 10;
+  if (email) bonus += 8;
+  const score = Math.min(100, base + bonus);
+  document.getElementById('secScore').textContent = score;
+  const color = score >= 90 ? 'var(--green)' : score >= 70 ? 'var(--cyan)' : 'var(--amber)';
+  document.getElementById('secScore').style.color = color;
+  document.getElementById('secBarFill').style.width = score + '%';
+  document.getElementById('secBarFill').style.background = score >= 90
+    ? 'linear-gradient(90deg,var(--green),var(--green2))'
+    : score >= 70
+    ? 'linear-gradient(90deg,var(--cyan),var(--blue))'
+    : 'linear-gradient(90deg,var(--amber),var(--amber2))';
+}
+
+// ── Notifications
+function toggleChannel(ch) {
+  const card = document.getElementById('nc-'+ch);
+  const status = document.getElementById('ncs-'+ch);
+  const isOn = card.classList.toggle('on');
+  status.textContent = isOn ? '● ACTIVE' : '○ INACTIVE';
+  status.className = 'nc-status ' + (isOn ? 'on' : 'off');
+  if (ch === 'webhook') {
+    document.getElementById('webhookFields').style.display = isOn ? 'block' : 'none';
+  }
+  showToast((isOn ? '✔ ' : '○ ') + ch.toUpperCase() + ' notifications ' + (isOn ? 'enabled' : 'disabled'));
+}
+
+// ── Sessions
+function killSession(btn) {
+  const row = btn.closest('tr');
+  row.style.opacity = '0.4';
+  row.style.transition = 'opacity .4s';
+  setTimeout(() => row.remove(), 400);
+  showToast('✔ Session revoked');
+}
+
+function killAllSessions() {
+  document.querySelectorAll('.session-kill').forEach(btn => killSession(btn));
+  showToast('✔ All other sessions revoked');
+}
+
+// ── ARIA model
+function selectModel(id, el) {
+  document.querySelectorAll('.model-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  showToast('🤖 ARIA model: ' + el.querySelector('.model-name').textContent);
+}
+
+// ── Provider URL map
+const providerUrls = {
+  google:      'https://generativelanguage.googleapis.com/v1beta/openai/',
+  openai:      'https://api.openai.com/v1',
+  anthropic:   'https://api.anthropic.com/v1',
+  openrouter:  'https://openrouter.ai/api/v1',
+  groq:        'https://api.groq.com/openai/v1',
+  together:    'https://api.together.xyz/v1',
+};
+function updateProviderUrl() {
+  const p = document.getElementById('apiProvider').value;
+  if (providerUrls[p]) document.getElementById('apiBaseUrl').value = providerUrls[p];
+}
+
+// ── Verify buttons
+function verifyEmail() { showToast('📧 Verification email sent'); document.getElementById('emailVerifyBadge').textContent = '✉ SENT'; }
+function verifyPhone() { showToast('📱 OTP sent to phone'); document.getElementById('phoneVerifyBadge').textContent = '✉ SENT'; }
+
+// ── Data rights
+function exportData() { showToast('📦 Export queued — check email in 24h'); }
+function requestCorrection() { showToast('✏️ Correction request submitted'); }
+function requestErasure() { showToast('🗑️ Erasure request submitted — 30 day processing'); }
+
+// ── Save all
+function saveAll() {
+  saveProfile();
+  showToast('✔ All changes saved');
+}
+
+// ── Danger zone
+let dangerType = null;
+function confirmDanger(type, msg) {
+  dangerType = type;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmInput').value = '';
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function confirmDelete() {
+  dangerType = 'delete';
+  document.getElementById('confirmMsg').textContent = '⚠ PERMANENTLY DELETE your PRAHARI account and all data? This cannot be undone.';
+  document.getElementById('confirmInput').value = '';
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('confirmModal').style.display = 'none';
+  dangerType = null;
+}
+function executeConfirm() {
+  if (document.getElementById('confirmInput').value !== 'CONFIRM') {
+    showToast('✗ Type CONFIRM exactly to proceed', true); return;
+  }
+  closeModal();
+  const msgs = {
+    clearHistory:  '✔ Conversation history cleared',
+    resetSettings: '✔ Settings reset to defaults',
+    revokeKeys:    '✔ All API keys revoked',
+    deactivate:    '💤 Account deactivated',
+    delete:        '⛔ Account deletion requested',
+  };
+  showToast(msgs[dangerType] || '✔ Action completed');
+  if (dangerType === 'resetSettings') localStorage.removeItem('prahari_settings');
+}
+
+// ── Toast
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.className = '', 3000);
+}
+
+// ── Init
+document.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+
+  // Profile completion on any input
+  document.querySelectorAll('#section-profile .field-input').forEach(el => {
+    el.addEventListener('input', updateProfileCompletion);
+    el.addEventListener('change', updateProfileCompletion);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRAHARI | ARIA v7.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+:root{--bg:#030a0f;--bg2:#060e17;--bg3:#0a1520;--border:#0b2a42;--border-lt:#163d5e;--green:#00ff88;--green2:#00cc6a;--red:#ff3366;--yellow:#ffaa00;--blue:#00aaff;--purple:#bb44ff;--cyan:#00ffee;--orange:#ff7700;--text:#c0ddf0;--text2:#6a9db0;--text3:#254560;--font-mono:'Share Tech Mono',monospace;--font-main:'Rajdhani',sans-serif;--font-head:'Orbitron',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-family:var(--font-main);overflow:hidden}
+body{display:flex;flex-direction:column}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.scanline{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,0.005) 2px,rgba(0,255,136,0.005) 4px);pointer-events:none;z-index:9997;animation:scan 12s linear infinite}
+@keyframes scan{0%{background-position:0 0}100%{background-position:0 100px}}
+#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh}
+nav{background:linear-gradient(180deg,rgba(3,10,15,0.98),rgba(3,10,15,0.93));border-bottom:1px solid var(--border-lt);padding:0 18px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);box-shadow:0 2px 30px rgba(0,255,136,0.06)}
+.nav-logo{font-family:var(--font-head);font-size:12px;color:var(--green);letter-spacing:3px;display:flex;align-items:center;gap:10px;font-weight:700;text-shadow:0 0 20px rgba(0,255,136,0.5)}
+.pulse{position:relative;width:10px;height:10px}
+.pulse::before{content:'';position:absolute;inset:0;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green)}
+.pulse::after{content:'';position:absolute;inset:-5px;border:1px solid var(--green);border-radius:50%;animation:ripple 2s infinite;opacity:0}
+@keyframes ripple{0%{transform:scale(.5);opacity:.8}100%{transform:scale(2);opacity:0}}
+.nav-tabs{display:flex;flex:1;margin:0 24px}
+.nav-tab{background:none;border:none;color:var(--text2);padding:8px 12px;font-family:var(--font-main);font-size:11px;letter-spacing:1px;cursor:pointer;text-transform:uppercase;transition:all .3s;border-bottom:2px solid transparent}
+.nav-tab:hover{color:var(--green);background:rgba(0,255,136,0.05)}
+.nav-tab.active{color:var(--green);border-bottom-color:var(--green);background:rgba(0,255,136,0.04)}
+.nav-right{font-family:var(--font-mono);font-size:9px;color:var(--text3);display:flex;gap:14px;align-items:center}
+.mode-pill{padding:3px 9px;border-radius:20px;font-size:8px;font-family:var(--font-mono);letter-spacing:1px;cursor:pointer;transition:all .3s;border:1px solid}
+.mode-pill.defensive{border-color:var(--blue);color:var(--blue);background:rgba(0,170,255,0.08)}
+.mode-pill.offensive{border-color:var(--red);color:var(--red);background:rgba(255,51,102,0.08)}
+.threat-badge{padding:3px 8px;border-radius:2px;font-size:8px;font-family:var(--font-mono);letter-spacing:1px;border:1px solid var(--yellow);color:var(--yellow);background:rgba(255,170,0,0.08)}
+.blink{animation:blink 1.5s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:255px;background:rgba(3,10,15,0.75);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.sb-header{padding:10px 12px;border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:9px;color:var(--green);letter-spacing:2px;display:flex;align-items:center;gap:8px}
+.sb-search{padding:8px 10px;border-bottom:1px solid var(--border)}
+.sb-search input{width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border-lt);color:var(--text);padding:5px 8px;border-radius:2px;font-family:var(--font-mono);font-size:9px;outline:none;transition:all .2s}
+.sb-search input:focus{border-color:var(--green);box-shadow:0 0 8px rgba(0,255,136,0.1)}
+.sb-search input::placeholder{color:var(--text3)}
+.sb-content{flex:1;overflow-y:auto;padding:8px}
+.db-cat{margin-bottom:12px}
+.db-cat-title{font-family:var(--font-mono);font-size:8px;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;padding-left:7px;border-left:2px solid var(--green);opacity:.75;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.db-cat-items{overflow:hidden;transition:max-height .3s ease}
+.db-item{background:rgba(0,255,136,0.02);border:1px solid var(--border);padding:5px 8px;margin-bottom:3px;border-radius:2px;font-size:9px;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;gap:5px;align-items:center}
+.db-item:hover{background:rgba(0,255,136,0.07);border-color:var(--green);color:var(--green);transform:translateX(3px)}
+.badge{font-size:7px;padding:1px 4px;border-radius:1px;margin-left:auto;flex-shrink:0;font-family:var(--font-mono)}
+.bc{background:rgba(255,51,102,.15);border:1px solid var(--red);color:var(--red)}
+.bh{background:rgba(255,170,0,.15);border:1px solid var(--yellow);color:var(--yellow)}
+.bm{background:rgba(0,170,255,.15);border:1px solid var(--blue);color:var(--blue)}
+.bp{background:rgba(187,68,255,.15);border:1px solid var(--purple);color:var(--purple)}
+.chat-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:14px}
+.welcome{text-align:center;padding:10px 0 20px;animation:fadeUp .8s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.hud-wrap{position:relative;width:110px;height:110px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+.hud-wrap svg{position:absolute;top:0;left:0}
+.hud-wrap .r1{animation:rot 9s linear infinite}
+.hud-wrap .r2{animation:rot 5s linear infinite reverse}
+.hud-wrap .r3{animation:rot 14s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.hud-icon{font-size:38px;position:relative;z-index:2;filter:drop-shadow(0 0 12px var(--green))}
+.wtitle{font-family:var(--font-head);font-size:22px;color:var(--green);letter-spacing:5px;text-shadow:0 0 30px rgba(0,255,136,.4);margin-bottom:3px}
+.wsub{font-family:var(--font-mono);font-size:9px;color:var(--text2);letter-spacing:3px;margin-bottom:3px}
+.wver{font-family:var(--font-mono);font-size:8px;color:var(--text3);margin-bottom:18px}
+.mode-selector{display:flex;gap:10px;justify-content:center;margin-bottom:18px}
+.mode-card{background:rgba(0,0,0,.3);border:1px solid var(--border-lt);border-radius:4px;padding:10px 18px;cursor:pointer;transition:all .3s;text-align:center;min-width:130px}
+.mode-card:hover,.mode-card.sel{transform:translateY(-2px)}
+.mode-card.defensive.sel{border-color:var(--blue);background:rgba(0,170,255,.08);box-shadow:0 4px 20px rgba(0,170,255,.15)}
+.mode-card.offensive.sel{border-color:var(--red);background:rgba(255,51,102,.08);box-shadow:0 4px 20px rgba(255,51,102,.15)}
+.mode-card-icon{font-size:22px;margin-bottom:4px}
+.mode-card-title{font-family:var(--font-head);font-size:10px;letter-spacing:2px;margin-bottom:2px}
+.mode-card.defensive .mode-card-title{color:var(--blue)}
+.mode-card.offensive .mode-card-title{color:var(--red)}
+.mode-card-desc{font-family:var(--font-mono);font-size:8px;color:var(--text3);line-height:1.4}
+.stats-row{display:flex;gap:10px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+.stat{background:rgba(0,255,136,.03);border:1px solid var(--border-lt);border-radius:2px;padding:7px 13px;text-align:center}
+.stat-v{font-family:var(--font-head);font-size:14px;display:block}
+.stat-l{font-family:var(--font-mono);font-size:7px;color:var(--text3);letter-spacing:1px;margin-top:2px;display:block}
+.sug-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px;max-width:780px;margin:0 auto;padding:0 8px}
+.sug-btn{background:linear-gradient(135deg,rgba(0,255,136,.05),rgba(0,170,255,.03));border:1px solid var(--border-lt);color:var(--text2);padding:9px 10px;cursor:pointer;border-radius:3px;font-family:var(--font-mono);font-size:9px;text-align:left;transition:all .3s;line-height:1.5;display:flex;gap:5px}
+.sug-btn:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,255,136,.08)}
+.sug-btn::before{content:"❯";color:var(--green);opacity:.5;flex-shrink:0}
+.msg{display:flex;gap:10px;animation:slideIn .3s ease-out}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{justify-content:flex-end}
+.msg-av{width:28px;height:28px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;border:1px solid var(--green);background:rgba(0,255,136,.07);position:relative}
+.msg-av.user-av{border-color:var(--blue);background:rgba(0,170,255,.07)}
+.msg-av.def-av{border-color:var(--green)}
+.msg-av.off-av{border-color:var(--red);border-style:dashed}
+.msg-av.crisis-av{border-color:var(--yellow);animation:alertBorder 1s ease-in-out 3}
+@keyframes alertBorder{0%,100%{box-shadow:0 0 0 0 rgba(255,170,0,.4)}50%{box-shadow:0 0 0 6px rgba(255,170,0,0)}}
+.msg-body{max-width:74%;display:flex;flex-direction:column;gap:4px}
+.msg-bubble{padding:11px 14px;border-radius:3px;border:1px solid var(--border);background:rgba(6,14,23,.9);line-height:1.7;font-size:12px;word-wrap:break-word;position:relative;overflow:hidden;white-space:pre-wrap}
+.msg-bubble::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent);opacity:.2}
+.msg-bubble.def{border-color:rgba(0,170,255,.2)}
+.msg-bubble.def::before{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+.msg-bubble.off{border-color:rgba(255,51,102,.2)}
+.msg-bubble.off::before{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.msg-bubble.crisis{border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.04)}
+.msg-bubble.crisis::before{background:linear-gradient(90deg,transparent,var(--yellow),transparent)}
+.msg.user .msg-bubble{background:rgba(0,170,255,.07);border-color:rgba(0,170,255,.25)}
+.msg-meta{font-family:var(--font-mono);font-size:8px;color:var(--text3);padding:0 4px;display:flex;gap:10px}
+.meta-mode{font-size:7px;padding:1px 5px;border-radius:10px;border:1px solid}
+.ld-wrap{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:10px;padding:10px 14px}
+.ld-dots span{width:4px;height:4px;border-radius:50%;display:inline-block;animation:bounce 1.4s infinite}
+.ld-dots span:nth-child(2){animation-delay:.2s}
+.ld-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-5px)}}
+.input-area{padding:14px 18px;background:linear-gradient(180deg,rgba(3,10,15,.5),rgba(3,10,15,.97));border-top:1px solid var(--border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.input-row{display:flex;gap:10px;align-items:stretch}
+.inp-wrap{flex:1;position:relative}
+.inp{width:100%;background:rgba(0,0,0,.55);border:1px solid var(--border-lt);color:var(--text);padding:10px 14px;border-radius:3px;outline:none;font-family:var(--font-mono);font-size:11px;transition:all .3s;resize:none;height:40px;max-height:100px;overflow-y:auto;line-height:1.4}
+.inp:focus{border-color:var(--green);background:rgba(0,0,0,.7);box-shadow:0 0 14px rgba(0,255,136,.12)}
+.inp::placeholder{color:var(--text3)}
+.send-btn{background:linear-gradient(135deg,var(--green),var(--green2));border:none;color:#000;padding:10px 20px;cursor:pointer;font-family:var(--font-head);font-size:10px;font-weight:700;letter-spacing:1px;border-radius:3px;transition:all .3s;text-transform:uppercase;position:relative;overflow:hidden;white-space:nowrap}
+.send-btn:hover{box-shadow:0 0 18px rgba(0,255,136,.45);transform:translateY(-1px)}
+.send-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.input-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.input-hints{font-family:var(--font-mono);font-size:7px;color:var(--text3);display:flex;gap:12px}
+.hk{background:rgba(255,255,255,.05);border:1px solid var(--border-lt);padding:1px 4px;border-radius:2px;font-size:6px}
+.char-count{font-family:var(--font-mono);font-size:7px;color:var(--text3)}
+/* error banner */
+.api-error{font-family:var(--font-mono);font-size:11px;color:var(--red);padding:8px 14px;border:1px solid rgba(255,51,102,.25);background:rgba(255,51,102,.06);border-radius:3px;margin-top:6px;display:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,255,136,.18);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,255,136,.35)}
+@media(max-width:768px){.sidebar{display:none}.msg-body{max-width:90%}.sug-grid{grid-template-columns:1fr}.wtitle{font-size:16px}.mode-selector{flex-direction:column;align-items:center}}
+/* ── inline style replacements ── */
+.nav-version{font-size:7px;color:var(--text3);font-weight:400;letter-spacing:1px;margin-left:4px}
+#api-status{color:var(--text3);font-family:var(--font-mono);font-size:9px}
+.svg-abs{position:absolute;top:0;left:0}
+.stat-v--red{color:var(--red)}
+.stat-v--yellow{color:var(--yellow)}
+.stat-v--purple{color:var(--purple)}
+.stat-v--cyan{color:var(--cyan)}
+#query-category{color:var(--green);font-size:8px;font-family:var(--font-head)}
+#mode-display{color:var(--blue)}
+  </style>
+ </head>
+ <body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="scanline"></div>
+  <div id="app">
+   <nav>
+    <div class="nav-logo">
+     <div class="pulse"></div>PRAHARI<span class="nav-version">v7.0</span>
+    </div>
+    <div class="nav-tabs">
+     <a href="index.html" class="nav-tab">📊 Dashboard</a>
+     <button class="nav-tab active">🤖 ARIA</button>
+     <a href="index.html" class="nav-tab">🌍 Threat Map</a>
+     <a href="index.html" class="nav-tab">⚖️ CyberLaw</a>
+     <a href="index.html" class="nav-tab">🚨 Report Fraud</a>
+     <a href="index.html" class="nav-tab">🔐 Vault</a>
+    </div>
+    <div class="nav-right">
+     <span class="mode-pill defensive" id="nav-mode-pill">🛡️ DEFENSIVE</span>
+     <span class="threat-badge">⚠ THREAT: ELEVATED</span>
+     <span id="api-status">● CHECKING…</span>
+     <span>⏱ <span id="timer" class="blink">00:00</span></span>
+    </div>
+   </nav>
+   <div class="main">
+    <div class="sidebar">
+     <div class="sb-header">📚 INTEL LIBRARY</div>
+     <div class="sb-search"><input id="sb-search" type="text" placeholder="Search knowledge base…"></div>
+     <div class="sb-content" id="sidebar"></div>
+    </div>
+    <div class="chat-wrap">
+     <div class="chat-msgs" id="messages">
+      <div class="welcome" id="welcome">
+       <div class="hud-wrap">
+        <svg class="r1" width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="50" fill="none" stroke="rgba(0,255,136,.12)" stroke-width="1"/><circle cx="55" cy="55" r="50" fill="none" stroke="var(--green)" stroke-width="1" stroke-dasharray="35 280" stroke-linecap="round"/><circle cx="55" cy="55" r="50" fill="none" stroke="var(--green)" stroke-width="1" stroke-dasharray="8 307" stroke-dashoffset="50" stroke-linecap="round"/></svg>
+        <svg class="r2 svg-abs" width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="rgba(0,170,255,.1)" stroke-width="1"/><circle cx="55" cy="55" r="40" fill="none" stroke="var(--blue)" stroke-width="1" stroke-dasharray="20 231" stroke-linecap="round"/></svg>
+        <svg class="r3 svg-abs" width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="30" fill="none" stroke="rgba(255,51,102,.08)" stroke-width="1"/><circle cx="55" cy="55" r="30" fill="none" stroke="var(--red)" stroke-width="1" stroke-dasharray="10 178" stroke-linecap="round"/></svg>
+        <div class="hud-icon">🛡️</div>
+       </div>
+       <div class="wtitle">ARIA ANALYST</div>
+       <div class="wsub">ADAPTIVE RESPONSE INTELLIGENCE AGENT</div>
+       <div class="wver">CORE v7.0 · GPT-POWERED · FULL-SPECTRUM CYBERSECURITY · ETHICAL AI</div>
+       <div class="mode-selector">
+        <div class="mode-card defensive sel" id="mode-def" onclick="setMode('defensive')">
+         <div class="mode-card-icon">🛡️</div>
+         <div class="mode-card-title">DEFENSIVE</div>
+         <div class="mode-card-desc">Consumer protection, fraud guidance, legal help, incident response</div>
+        </div>
+        <div class="mode-card offensive" id="mode-off" onclick="setMode('offensive')">
+         <div class="mode-card-icon">⚔️</div>
+         <div class="mode-card-title">OFFENSIVE</div>
+         <div class="mode-card-desc">Ethical hacking, pentesting, vulnerability research, exploit analysis</div>
+        </div>
+       </div>
+       <div class="stats-row">
+        <div class="stat"><span class="stat-v stat-v--red">3,100+</span><span class="stat-l">CVEs TRACKED</span></div>
+        <div class="stat"><span class="stat-v stat-v--yellow">ELEVATED</span><span class="stat-l">GLOBAL THREAT</span></div>
+        <div class="stat"><span class="stat-v">MITRE v14</span><span class="stat-l">ATT&CK MAPPED</span></div>
+        <div class="stat"><span class="stat-v stat-v--purple">Art.21+DPDP</span><span class="stat-l">CONSTITUTIONAL</span></div>
+        <div class="stat"><span class="stat-v stat-v--cyan">GPT-4o</span><span class="stat-l">AI ENGINE</span></div>
+       </div>
+       <div class="sug-grid" id="suggestions"></div>
+      </div>
+     </div>
+     <div class="input-area">
+      <div class="input-row">
+       <div class="inp-wrap">
+        <textarea class="inp" id="inp" placeholder="Describe your situation, query, or threat scenario… ARIA will guide you." rows="1"></textarea>
+       </div>
+       <button class="send-btn" id="send-btn">TRANSMIT</button>
+      </div>
+      <div class="input-footer">
+       <div class="input-hints">
+        <span><span class="hk">ENTER</span> Send</span>
+        <span><span class="hk">SHIFT+ENTER</span> New line</span>
+        <span id="query-category">[ GENERAL ]</span>
+       </div>
+       <div class="char-count"><span id="char-count">0</span> chars · <span id="mode-display">DEFENSIVE MODE</span></div>
+      </div>
+      <div class="api-error" id="api-error"></div>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <script>
+  'use strict';
+
+  // ═══════════════════════════════════════════════════════════
+  // CONFIG — Update API_BASE if you deploy to a different host
+  // ═══════════════════════════════════════════════════════════
+  const API_BASE = window.location.origin; // same origin as the Node server
+
+  // ═══════════════════════════════════════════════════════════
+  // BACKGROUND CANVAS
+  // ═══════════════════════════════════════════════════════════
+  const cv = document.getElementById('bg-canvas');
+  const cx = cv.getContext('2d');
+  let W, H, t = 0;
+  function rsz() { W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+  rsz(); window.addEventListener('resize', rsz);
+
+  class Pt {
+    constructor() { this.reset(); }
+    reset() { this.x=Math.random()*W; this.y=Math.random()*H; this.vx=(Math.random()-.5)*.25; this.vy=-Math.random()*.35-.05; this.life=Math.random(); this.ml=.5+Math.random()*.5; this.sz=Math.random()*1.4+.3; this.h=Math.random()>.65?200:150; }
+    update() { this.x+=this.vx; this.y+=this.vy; this.life-=.0025; if(this.life<=0||this.y<0) this.reset(); }
+    draw() { cx.save(); cx.globalAlpha=Math.max(0,this.life/this.ml)*.5; cx.fillStyle=`hsl(${this.h},100%,60%)`; cx.shadowColor=cx.fillStyle; cx.shadowBlur=5; cx.beginPath(); cx.arc(this.x,this.y,this.sz,0,Math.PI*2); cx.fill(); cx.restore(); }
+  }
+  class Node {
+    constructor() { this.x=Math.random()*W; this.y=Math.random()*H; this.vx=(Math.random()-.5)*.12; this.vy=(Math.random()-.5)*.12; this.r=1+Math.random()*1.8; }
+    update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>W) this.vx*=-1; if(this.y<0||this.y>H) this.vy*=-1; }
+  }
+  const nodes = Array.from({length:55}, ()=>new Node());
+  const pts = Array.from({length:100}, ()=>new Pt());
+  function frame() {
+    cx.clearRect(0,0,W,H);
+    cx.strokeStyle='rgba(0,255,136,0.02)'; cx.lineWidth=.4;
+    for(let x=0;x<W;x+=65){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke();}
+    for(let y=0;y<H;y+=65){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke();}
+    nodes.forEach(n=>{
+      nodes.forEach(m=>{const d=Math.hypot(n.x-m.x,n.y-m.y);if(d<130){cx.strokeStyle=`rgba(0,255,136,${(1-d/130)*.1})`;cx.lineWidth=.3;cx.beginPath();cx.moveTo(n.x,n.y);cx.lineTo(m.x,m.y);cx.stroke();}});
+      cx.fillStyle='rgba(0,255,136,0.2)'; cx.beginPath(); cx.arc(n.x,n.y,n.r,0,Math.PI*2); cx.fill();
+      n.update();
+    });
+    pts.forEach(p=>{p.update();p.draw();});
+    cx.save(); cx.translate(W/2,H/2); cx.rotate(t*.0004); cx.strokeStyle='rgba(0,255,136,0.025)'; cx.lineWidth=.8;
+    for(let r=80;r<Math.max(W,H)*.8;r+=90){cx.beginPath();cx.arc(0,0,r,0,Math.PI*2);cx.stroke();}
+    cx.restore(); t++; requestAnimationFrame(frame);
+  }
+  frame();
+
+  // ═══════════════════════════════════════════════════════════
+  // TIMER
+  // ═══════════════════════════════════════════════════════════
+  let elapsed = 0;
+  setInterval(() => {
+    elapsed++;
+    const m = String(Math.floor(elapsed/60)).padStart(2,'0');
+    const s = String(elapsed%60).padStart(2,'0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }, 1000);
+
+  // ═══════════════════════════════════════════════════════════
+  // QUERY CATEGORISER
+  // ═══════════════════════════════════════════════════════════
+  const QUERY_ANALYZER = {
+    legal:    /IT.?Act|cyber.?law|section.*\d{2}|article.*\d{1,2}|DPDP|data.?protection|constitutional|puttaswamy|shreya.?singhal|court|judge|conviction|fine.*rupee|penalty/i,
+    fraud:    /digital.?arrest|UPI|phishing|scam|fraud|swindle|stolen|hacked|SIM.?swap|blackmail|extortion|threatening|impersonation|fake/i,
+    attack:   /exploit|cve-|vulnerability|pentest|hacking|malware|ransomware|rootkit|backdoor|reverse.?engineer|payload|shellcode|injection|bypass|privilege|escalation|lateral/i,
+    defense:  /secure|protection|defense|firewall|encryption|authentication|mfa|detection|incident|response|hardening|audit|compliance/i,
+    infrastructure: /networking|linux|windows|server|cloud|aws|azure|docker|kubernetes|database|api|protocol|tcp|udp|dns/i,
+  };
+  function categorizeQuery(q) {
+    for (const [cat, rx] of Object.entries(QUERY_ANALYZER)) if (rx.test(q)) return cat;
+    return 'general';
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // CRISIS DETECTION
+  // ═══════════════════════════════════════════════════════════
+  const CRISIS_PATTERNS = [/digital.?arrest/i,/police.?call/i,/CBI.?(call|online)/i,/ED.?(call|online)/i,/money.*transferred.*fraud/i,/UPI.*fraud/i,/SIM.*swap/i,/account.*hacked.*money/i,/OTP.*stolen/i,/blackmail/i];
+  function isCrisis(q) { return CRISIS_PATTERNS.some(r=>r.test(q)); }
+
+  // ═══════════════════════════════════════════════════════════
+  // SUGGESTIONS
+  // ═══════════════════════════════════════════════════════════
+  const SUGGESTIONS = {
+    defensive: [
+      'I got a call saying I am under "digital arrest" — help!',
+      'Someone did a UPI fraud on my account. Emergency steps?',
+      'How to report cybercrime to Indian police or CERT-In?',
+      'Is this email a phishing attempt? How do I check?',
+      'How to secure my home WiFi against attacks?',
+      'What does the IT Act say about online fraud victims?',
+      'My Instagram was hacked. How to recover it?',
+      'What are my legal rights after a data breach?',
+    ],
+    offensive: [
+      'Full network pentest methodology from recon to report',
+      'Kerberoasting attack: technique, tools, and detection',
+      'Web app pentest: OWASP Top 10 testing checklist',
+      'Reverse engineering malware with Ghidra: getting started',
+      'Active Directory attack path with BloodHound',
+      'CVE-2024-3400 PAN-OS exploitation technical deep dive',
+      'Cobalt Strike OPSEC: detection and evasion techniques',
+      'Post-quantum cryptography: when to migrate and how?',
+    ],
+  };
+
+  let currentMode = 'defensive';
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('mode-def').classList.toggle('sel', mode==='defensive');
+    document.getElementById('mode-off').classList.toggle('sel', mode==='offensive');
+    const pill = document.getElementById('nav-mode-pill');
+    if (mode === 'defensive') { pill.textContent='🛡️ DEFENSIVE'; pill.className='mode-pill defensive'; }
+    else                      { pill.textContent='⚔️ OFFENSIVE'; pill.className='mode-pill offensive'; }
+    document.getElementById('mode-display').textContent = mode.toUpperCase()+' MODE';
+    document.getElementById('mode-display').style.color = mode==='defensive'?'var(--blue)':'var(--red)';
+    buildSuggestions();
+    // Reset conversation context for new mode
+    conversationHistory = [];
+  }
+
+  function buildSuggestions() {
+    const el = document.getElementById('suggestions');
+    el.innerHTML = '';
+    SUGGESTIONS[currentMode].forEach(s=>{
+      const btn = document.createElement('button');
+      btn.className = 'sug-btn';
+      btn.textContent = s;
+      btn.onclick = () => send(s);
+      el.appendChild(btn);
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SIDEBAR
+  // ═══════════════════════════════════════════════════════════
+  const SB_DATA = {
+    '⚖️ INDIAN CYBER LAW': [
+      {n:'IT Act §43: Unauthorized Access',b:'bp',q:'Explain IT Act Section 43: unauthorized access penalties and civil remedies'},
+      {n:'IT Act §66: Computer Fraud',b:'bc',q:'Section 66 computer crime punishment and investigation process India'},
+      {n:'IT Act §66C: Identity Theft',b:'bc',q:'Section 66C identity theft using Aadhaar/UPI legal action India'},
+      {n:'IT Act §66D: Cheating via Computer',b:'bc',q:'Section 66D online scams impersonation legal remedies India'},
+      {n:'IT Act §66E: Privacy Violation',b:'bc',q:'Section 66E non-consensual intimate images victim help India'},
+      {n:'IT Act §66F: Cyber Terrorism',b:'bc',q:'Section 66F cyber terrorism definition penalties life sentence India'},
+      {n:'IT Act §79: Intermediary Liability',b:'bp',q:'Section 79 social media platform liability immune conditions India'},
+      {n:'Article 19(1)(a): Free Speech',b:'bp',q:'Article 19 free speech right digital content protected speech India'},
+      {n:'Article 21: Right to Privacy',b:'bp',q:'Article 21 digital privacy Puttaswamy judgment fundamental right India'},
+      {n:'DPDP Act 2023 Overview',b:'bp',q:'Digital Personal Data Protection Act 2023 key provisions rights India'},
+      {n:'Data Protection Board',b:'bp',q:'How to file complaint with Data Protection Board India DPDP'},
+      {n:'Shreya Singhal v. UoI (2015)',b:'bp',q:'Shreya Singhal Section 66A unconstitutional free speech judgment impact'},
+    ],
+    '🚨 CYBER FRAUD & SCAMS': [
+      {n:'Digital Arrest Scam',b:'bc',q:'Digital arrest scam CBI ED Police call — immediate steps what to do India'},
+      {n:'UPI Fraud Emergency',b:'bc',q:'UPI fraud money stolen 24 hour recovery bank freeze steps India'},
+      {n:'SIM Swap Attack',b:'bc',q:'SIM swap attack OTP stolen account compromised — help and recovery India'},
+      {n:'Phishing Email Detection',b:'bh',q:'How to identify phishing email — red flags and verification steps'},
+      {n:'Investment Scam',b:'bh',q:'Online investment scam fake promises high returns — report and recover India'},
+      {n:'Blackmail / Sextortion',b:'bc',q:'Sextortion blackmail threat intimate video extortion — help and legal steps India'},
+      {n:'Tech Support Scam',b:'bh',q:'Tech support scam malware scare pop-up — how to respond and report'},
+      {n:'Cryptocurrency Scam',b:'bh',q:'Crypto scam pump dump scheme — how to identify and report India'},
+    ],
+    '⚔️ ATTACK TECHNIQUES': [
+      {n:'CVE-2024-3400 PAN-OS RCE',b:'bc',q:'CVE-2024-3400 Paloalto PAN-OS exploitation chain technical analysis'},
+      {n:'SQL Injection Deep Dive',b:'bh',q:'SQL injection UNION time-based blind detection WAF bypass techniques'},
+      {n:'Cross-Site Scripting (XSS)',b:'bh',q:'XSS stored reflected DOM payload filter evasion techniques'},
+      {n:'Active Directory Attacks',b:'bc',q:'Active Directory Kerberoasting DCSync BloodHound attack path'},
+      {n:'Reverse Engineering Malware',b:'bh',q:'Ghidra binary reverse engineer malware analysis dynamic static'},
+      {n:'Privilege Escalation Linux',b:'bh',q:'Linux privilege escalation SUID bit sudo misconfiguration techniques'},
+      {n:'Ransomware Analysis',b:'bc',q:'Ransomware double extortion encryption key recovery analysis'},
+      {n:'Social Engineering TTPs',b:'bh',q:'Social engineering pretexting phishing vishing manipulation techniques'},
+    ],
+    '🛡️ DEFENSIVE SECURITY': [
+      {n:'CIA Triad Fundamentals',b:'bm',q:'Explain CIA Triad confidentiality integrity availability with examples'},
+      {n:'Zero Trust Architecture',b:'bm',q:'Zero trust never trust always verify microsegmentation implementation'},
+      {n:'NIST Cybersecurity Framework',b:'bm',q:'NIST CSF identify protect detect respond recover full explanation'},
+      {n:'Incident Response Plan',b:'bm',q:'Incident response lifecycle preparation detection containment eradication'},
+      {n:'Multi-Factor Authentication',b:'bm',q:'MFA two factor authentication TOTP hardware keys types comparison'},
+      {n:'SIEM & Log Monitoring',b:'bm',q:'SIEM centralized logging ELK Splunk log analysis alerts setup'},
+      {n:'Penetration Testing Basics',b:'bh',q:'Penetration testing methodology phases report writing'},
+    ],
+  };
+
+  function buildSidebar() {
+    const el = document.getElementById('sidebar');
+    Object.entries(SB_DATA).forEach(([section, items]) => {
+      const div = document.createElement('div'); div.className = 'db-cat';
+      const title = document.createElement('div'); title.className = 'db-cat-title';
+      title.innerHTML = `${section}<span style="font-size:8px;opacity:.5">▾</span>`;
+      const itemsDiv = document.createElement('div'); itemsDiv.className = 'db-cat-items';
+      items.forEach(item => {
+        const d = document.createElement('div'); d.className = 'db-item';
+        d.innerHTML = `<span style="color:var(--green);opacity:.5;font-size:8px">▸</span><span style="flex:1;font-size:9px">${item.n}</span><span class="badge ${item.b}">${item.b==='bc'?'CRIT':item.b==='bh'?'HIGH':item.b==='bm'?'MED':'LAW'}</span>`;
+        d.onclick = () => {
+          document.getElementById('inp').value = item.q;
+          document.getElementById('query-category').textContent = `[${categorizeQuery(item.q).toUpperCase()}]`;
+          document.getElementById('inp').focus();
+        };
+        itemsDiv.appendChild(d);
+      });
+      title.onclick = () => { const h=itemsDiv.style.maxHeight; itemsDiv.style.maxHeight=h?'':itemsDiv.scrollHeight+'px'; };
+      itemsDiv.style.maxHeight = section.includes('FRAUD')||section.includes('LAW') ? itemsDiv.scrollHeight+'px' : '0';
+      div.appendChild(title); div.appendChild(itemsDiv); el.appendChild(div);
+    });
+    setTimeout(() => {
+      document.querySelectorAll('.db-cat-items').forEach(el => { if(!el.style.maxHeight||el.style.maxHeight==='0') el.style.maxHeight='0'; else el.style.maxHeight=el.scrollHeight+'px'; });
+    }, 50);
+  }
+
+  document.getElementById('sb-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.db-item').forEach(item => { item.style.display = item.textContent.toLowerCase().includes(q)||!q?'':'none'; });
+    if (q) document.querySelectorAll('.db-cat-items').forEach(el => el.style.maxHeight=el.scrollHeight+'px');
+  });
+
+  // ═══════════════════════════════════════════════════════════
+  // MESSAGE RENDERING
+  // ═══════════════════════════════════════════════════════════
+  let conversationHistory = []; // [{role, content}]
+  let isLoading = false;
+
+  function escHtml(text) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(text)));
+    return d.innerHTML;
+  }
+
+  function addMessage(text, type='aria', mode='defensive', crisis=false) {
+    const container = document.getElementById('messages');
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.remove();
+
+    const msgEl = document.createElement('div');
+    msgEl.className = `msg ${type}`;
+
+    let avClass = type==='user' ? 'user-av' : crisis ? 'crisis-av' : mode==='offensive' ? 'off-av' : 'def-av';
+    let bubbleClass = 'msg-bubble';
+    if (mode==='offensive') bubbleClass += ' off';
+    else if (mode==='defensive') bubbleClass += ' def';
+    if (crisis) bubbleClass += ' crisis';
+    const avatar = type==='user' ? '👤' : crisis ? '⚠️' : mode==='offensive' ? '⚔️' : '🛡️';
+    const ts = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+    msgEl.innerHTML = `
+      <div class="msg-av ${avClass}">${avatar}</div>
+      <div class="msg-body">
+        <div class="${bubbleClass}">${escHtml(text)}</div>
+        <div class="msg-meta">
+          <span class="meta-mode">${mode.toUpperCase()}</span>
+          <span>${ts}</span>
+        </div>
+      </div>`;
+    container.appendChild(msgEl);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function showLoading() {
+    isLoading = true;
+    document.getElementById('send-btn').disabled = true;
+    const container = document.getElementById('messages');
+    const el = document.createElement('div');
+    el.className = 'msg'; el.id = 'loading-msg';
+    el.innerHTML = `<div class="msg-av def-av">🛡️</div><div class="msg-body"><div class="ld-wrap"><span style="color:var(--green)">ARIA ANALYZING</span><div class="ld-dots"><span style="background:var(--green)"></span><span style="background:var(--green)"></span><span style="background:var(--green)"></span></div></div></div>`;
+    container.appendChild(el);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function hideLoading() {
+    isLoading = false;
+    document.getElementById('send-btn').disabled = false;
+    const el = document.getElementById('loading-msg');
+    if (el) el.remove();
+  }
+
+  function showApiError(msg) {
+    const el = document.getElementById('api-error');
+    el.textContent = '⚠ ' + msg;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 7000);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // MAIN SEND — calls the backend /api/chat
+  // ═══════════════════════════════════════════════════════════
+  async function send(text) {
+    if (isLoading || !text.trim()) return;
+    text = text.trim().slice(0, 2000);
+
+    const crisis = isCrisis(text);
+    const queryCategory = categorizeQuery(text);
+
+    // Show user message
+    addMessage(text, 'user', currentMode, false);
+
+    // Update history (user turn)
+    conversationHistory.push({ role: 'user', content: text });
+
+    document.getElementById('inp').value = '';
+    document.getElementById('char-count').textContent = '0';
+    document.getElementById('query-category').textContent = `[${queryCategory.toUpperCase()}]`;
+
+    showLoading();
+
+    try {
+      const res = await fetch(`${API_BASE}/api/chat`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: conversationHistory,
+          mode:     currentMode,
+          stream:   false,
+        }),
+        signal: AbortSignal.timeout(60000), // 60s timeout
+      });
+
+      hideLoading();
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      const data    = await res.json();
+      const content = data.content || '';
+
+      // Update history (assistant turn)
+      conversationHistory.push({ role: 'assistant', content });
+
+      // Keep last 20 turns in memory
+      if (conversationHistory.length > 40) conversationHistory = conversationHistory.slice(-40);
+
+      addMessage(content, 'aria', currentMode, crisis);
+
+    } catch (err) {
+      hideLoading();
+      const friendly = err.name === 'TimeoutError'
+        ? 'Request timed out — please try again.'
+        : err.message.includes('fetch')
+          ? 'Cannot reach server. Is it running? (node server.js)'
+          : err.message;
+      showApiError(friendly);
+      // Remove last user message from history on error
+      conversationHistory.pop();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // INPUT HANDLERS
+  // ═══════════════════════════════════════════════════════════
+  document.getElementById('inp').addEventListener('input', function() {
+    document.getElementById('char-count').textContent = this.value.length;
+    document.getElementById('query-category').textContent = `[${categorizeQuery(this.value).toUpperCase()}]`;
+  });
+  document.getElementById('inp').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(this.value); }
+  });
+  document.getElementById('send-btn').addEventListener('click', () => send(document.getElementById('inp').value));
+
+  // ═══════════════════════════════════════════════════════════
+  // HEALTH CHECK on load
+  // ═══════════════════════════════════════════════════════════
+  async function checkHealth() {
+    const statusEl = document.getElementById('api-status');
+    try {
+      const res  = await fetch(`${API_BASE}/api/health`);
+      const data = await res.json();
+      if (data.ai_ready) {
+        statusEl.textContent = `● ONLINE · ${data.model}`;
+        statusEl.style.color = 'var(--green)';
+      } else {
+        statusEl.textContent = '⚠ AI KEY MISSING';
+        statusEl.style.color = 'var(--red)';
+        showApiError('AI_API_KEY not set in .env — set it and restart the server.');
+      }
+    } catch {
+      statusEl.textContent = '● SERVER OFFLINE';
+      statusEl.style.color = 'var(--red)';
+      showApiError('Backend server is not running. Start it with: node server.js');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════════════════════
+  buildSidebar();
+  buildSuggestions();
+  checkHealth();
+  </script>
+ </body>
+</html>
